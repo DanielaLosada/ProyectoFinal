@@ -11,9 +11,9 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Document ("Clientes")
-public class Cliente  implements Serializable {
+public class Cliente extends Cuenta   implements Serializable {
 
     private String fotoPerfil;
     @Id
@@ -21,6 +21,9 @@ public class Cliente  implements Serializable {
     private String codigo;
     private String nickName;
     private String ciudad;
+
+
+
 
 
 
