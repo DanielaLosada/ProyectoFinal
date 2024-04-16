@@ -7,11 +7,9 @@ import org.hibernate.validator.constraints.Length;
 public record RegistroClienteDTO (
         @NotBlank @Length(max = 100) String nombre,
         @NotBlank String fotoPerfil,
-        @NotBlank String nickname,
-        @NotBlank @Email String email,
-        @NotBlank @Length(min = 5) String password,
-        @NotBlank String ciudadResidencia
+        @NotBlank @Length(max = 10) String nickname,
+        @NotBlank @Email @Length(max = 100) String email,
+        @NotBlank @Length(min = 7) String password,
+        @NotBlank @Length(max = 50) String ciudadResidencia
 ) {
-
-
 }
