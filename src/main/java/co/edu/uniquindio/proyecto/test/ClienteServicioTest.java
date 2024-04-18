@@ -1,6 +1,6 @@
 package co.edu.uniquindio.proyecto.test;
 
-import co.edu.uniquindio.proyecto.dto.RegistroClienteDTO;
+import co.edu.uniquindio.proyecto.dto.ClienteDTO.RegistroClienteDTO;
 import co.edu.uniquindio.proyecto.servicios.interfaces.ClienteServicio;
 import com.mongodb.assertions.Assertions;
 import org.junit.Test;

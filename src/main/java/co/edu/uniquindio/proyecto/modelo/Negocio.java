@@ -19,6 +19,8 @@ public class  Negocio implements Serializable {
 
     private String nombre;
     private String descripcion;
+    @Id
+    @EqualsAndHashCode.Include
     private String codigo;
     private String codigoCliente;
     private List<String> listTelefonos;
@@ -28,6 +30,8 @@ public class  Negocio implements Serializable {
     private EstadoRegistro estadoRegistro;
     private Ubicacion ubicacion;
     private List<HistorialRevision> listHistorialRevisiones;
+    private List<Reserva> listReservas;
+
 
 
 

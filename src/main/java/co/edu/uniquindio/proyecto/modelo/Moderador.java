@@ -6,7 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 
-public class Moderador {
+public class Moderador extends Cuenta {
+
+
     private String codigo;
 
 }

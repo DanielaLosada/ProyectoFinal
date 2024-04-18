@@ -1,6 +1,6 @@
 package co.edu.uniquindio.proyecto.servicios.interfaces;
 
-public interface ComentarioServicio {
+public interface ReseñaServicio {
     void crearComentario();
     void responderComentario();
     void listarComentariosNegocio();

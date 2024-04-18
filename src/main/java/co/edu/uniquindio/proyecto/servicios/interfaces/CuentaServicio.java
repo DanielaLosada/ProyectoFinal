@@ -1,7 +1,7 @@
 package co.edu.uniquindio.proyecto.servicios.interfaces;
 
-import co.edu.uniquindio.proyecto.dto.CambioPasswordDTO;
-import co.edu.uniquindio.proyecto.dto.SesionDTO;
+import co.edu.uniquindio.proyecto.dto.ClienteDTO.CambioPasswordDTO;
+import co.edu.uniquindio.proyecto.dto.ClienteDTO.SesionDTO;
 
 public interface CuentaServicio {
     void iniciarSesion(SesionDTO sesionDTO)throws Exception;

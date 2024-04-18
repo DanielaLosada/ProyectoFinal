@@ -2,10 +2,10 @@ package co.edu.uniquindio.proyecto.servicios.implementacion;
 
 
 import co.edu.uniquindio.proyecto.Repositorios.ClienteRepo;
-import co.edu.uniquindio.proyecto.dto.ActualizarClienteDTO;
-import co.edu.uniquindio.proyecto.dto.DetalleClienteDTO;
-import co.edu.uniquindio.proyecto.dto.ItemClienteDTO;
-import co.edu.uniquindio.proyecto.dto.RegistroClienteDTO;
+import co.edu.uniquindio.proyecto.dto.ClienteDTO.ActualizarClienteDTO;
+import co.edu.uniquindio.proyecto.dto.ClienteDTO.DetalleClienteDTO;
+import co.edu.uniquindio.proyecto.dto.ClienteDTO.ItemClienteDTO;
+import co.edu.uniquindio.proyecto.dto.ClienteDTO.RegistroClienteDTO;
 import co.edu.uniquindio.proyecto.modelo.Cliente;
 import co.edu.uniquindio.proyecto.modelo.EstadoRegistro;
 import co.edu.uniquindio.proyecto.servicios.interfaces.ClienteServicio;

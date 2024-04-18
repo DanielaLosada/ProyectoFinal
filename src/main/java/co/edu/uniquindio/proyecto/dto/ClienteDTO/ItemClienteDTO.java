@@ -1,4 +1,4 @@
-package co.edu.uniquindio.proyecto.dto;
+package co.edu.uniquindio.proyecto.dto.ClienteDTO;
 
 public record ItemClienteDTO(
 
