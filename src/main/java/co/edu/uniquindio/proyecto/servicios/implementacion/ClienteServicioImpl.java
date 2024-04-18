@@ -2,6 +2,7 @@ package co.edu.uniquindio.proyecto.servicios.implementacion;
 
 
 import co.edu.uniquindio.proyecto.Repositorios.ClienteRepo;
+import co.edu.uniquindio.proyecto.Repositorios.NegocioRepo;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.ActualizarClienteDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.DetalleClienteDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.ItemClienteDTO;
@@ -9,75 +10,59 @@ import co.edu.uniquindio.proyecto.dto.ClienteDTO.RegistroClienteDTO;
 import co.edu.uniquindio.proyecto.modelo.Cliente;
 import co.edu.uniquindio.proyecto.modelo.EstadoRegistro;
 import co.edu.uniquindio.proyecto.servicios.interfaces.ClienteServicio;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
+@Getter
+@Setter
 public class ClienteServicioImpl implements ClienteServicio {
     private final ClienteRepo clienteRepo;
-
-    public ClienteServicioImpl(ClienteRepo clienteRepo) {
-        this.clienteRepo = clienteRepo;
-    }
-
-    @Override
-    public String registrarse(RegistroClienteDTO registroClienteDTO) throws Exception {
-        return null;
-    }
-
-    @Override
-    public void editarPerfil(ActualizarClienteDTO actualizarClienteDTO) {
-
-    }
-
-    @Override
-    public void eliminarCuenta() {
-
-    }
-
-    @Override
-    public void cambiarPassword() {
-
-    }
-
-    @Override
-    public void enviarLinkRecuperacion() {
-
-    }
-
-    @Override
-    public void iniciarSesion() {
-
-    }
+    private final NegocioRepo negocioRepo;
 
     @Override
     public String registrarCliente(RegistroClienteDTO registroClienteDTO) throws Exception {
-
-        if( existeEmail(registroClienteDTO.email()) ){
-            throw new Exception("El correo ya se encuentra registrado");
-        }
-
-        if( existeNickname(registroClienteDTO.nickname()) ){
-            throw new Exception("El nickname ya se encuentra registrado por otro usuario");
-        }
-    //Se crea el objeto Cliente
+        //Se crea el objeto usuario
         Cliente cliente = new Cliente();
-    //Se le asignan sus campos
+        //Se le asigna al usuario la información que trae registroDTO
         cliente.setNombre( registroClienteDTO.nombre() );
-        cliente.setNickName( registroClienteDTO.nickname() );
+        if (existeNickname(registroClienteDTO.nickname()) ){
+            throw new Exception("El nickname ya se encuentra en uso");
+        }else
+            cliente.setNickName( registroClienteDTO.nickname() );
         cliente.setCiudad( registroClienteDTO.ciudadResidencia() );
         cliente.setFotoPerfil( registroClienteDTO.fotoPerfil() );
-        cliente.setEmail( registroClienteDTO.email() );
-        cliente.setPassword( registroClienteDTO.password() );
+
+        if(existeEmail(registroClienteDTO.email()) ){
+            throw new Exception("El correo ya se encuentra registrado");
+        }else {
+            cliente.setEmail( registroClienteDTO.email() );
+        }
+        if (!validarPatronContrasenia(registroClienteDTO.password())){
+            throw new Exception("La contraseña no cumple con las características indicadas");
+        }else {
+            cliente.setPassword(registroClienteDTO.password());
+        }
+        //Encriptación
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String passwordEncriptada = passwordEncoder.encode( registroClienteDTO.password());
+        cliente.setPassword( passwordEncriptada );
         cliente.setEstado(EstadoRegistro.ACTIVO);
-    //Se guarda en la base de datos y obtenemos el objeto registrado
+        //Se guarda en la base de datos y obtenemos el objeto registrado
         Cliente clienteGuardado = clienteRepo.save(cliente);
-    //Retornamos el id (código) del cliente registrado
+        //Retornamos el id (código) del cliente registrado
         return clienteGuardado.getCodigo();
     }
 
@@ -88,6 +73,17 @@ public class ClienteServicioImpl implements ClienteServicio {
     private boolean existeNickname (String nickName){
         return clienteRepo.findBynickName(nickName).isPresent();
     }
+
+    private boolean validarPatronContrasenia(String contrasenia) {
+        // Patrón para validar la contraseña
+        String patron = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+        // Compilamos el patrón
+        Pattern pattern = Pattern.compile(patron);
+        // Creamos un matcher con la contraseña dada
+        Matcher matcher = pattern.matcher(contrasenia);
+        return matcher.matches();
+    }
+
     @Override
     public void actualizarCliente(ActualizarClienteDTO actualizarClienteDTO) throws Exception {
     //Buscamos el cliente que se quiere actualizar
@@ -105,6 +101,7 @@ public class ClienteServicioImpl implements ClienteServicio {
     //Como el objeto cliente ya tiene un id, el save() no crea un nuevo registro sino que actualiza el que ya existe
         clienteRepo.save(cliente);
     }
+
     @Override
     public void eliminarCliente(String idCuenta) throws Exception {
     //Buscamos el cliente que se quiere eliminar
@@ -119,6 +116,7 @@ public class ClienteServicioImpl implements ClienteServicio {
     //Como el objeto cliente ya tiene un id, el save() no crea un nuevo registro sino que actualiza el que ya existe
         clienteRepo.save(cliente);
     }
+
     @Override
     public DetalleClienteDTO obtenerCliente(String idCuenta) throws Exception {
     //Buscamos el cliente que se quiere eliminar

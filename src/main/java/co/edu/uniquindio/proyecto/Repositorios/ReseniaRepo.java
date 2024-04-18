@@ -1,11 +1,9 @@
 package co.edu.uniquindio.proyecto.Repositorios;
 
-import co.edu.uniquindio.proyecto.modelo.Reseña;
+import co.edu.uniquindio.proyecto.modelo.Resenia;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ReseñaRepo extends MongoRepository<Reseña, String > {
-
-
+public interface ReseniaRepo extends MongoRepository<Resenia, String > {
 }

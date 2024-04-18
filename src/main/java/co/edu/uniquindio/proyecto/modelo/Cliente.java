@@ -7,6 +7,7 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.io.Serializable;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,6 +22,9 @@ public class Cliente extends Cuenta   implements Serializable {
     private String codigo;
     private String nickName;
     private String ciudad;
+    private List<String> registroBusquedas;
+    private List <String> negociosFavoritos;
+
 
 
 

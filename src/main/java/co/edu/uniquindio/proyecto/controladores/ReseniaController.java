@@ -1,4 +1,4 @@
 package co.edu.uniquindio.proyecto.controladores;
 
-public class ReseñaController {
+public class ReseniaController {
 }

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @ToString
 
 
-public class Reseña {
+public class Resenia {
 
     private int calificacion;
     private String codigoCliente;

@@ -1,4 +1,6 @@
 package co.edu.uniquindio.proyecto.dto;
 
-public record TokenDTO() {
+import jakarta.validation.constraints.NotBlank;
+
+public record TokenDTO(@NotBlank String toker) {
 }
