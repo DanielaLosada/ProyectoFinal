@@ -7,8 +7,9 @@ import co.edu.uniquindio.proyecto.dto.ClienteDTO.ActualizarClienteDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.DetalleClienteDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.ItemClienteDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.RegistroClienteDTO;
-import co.edu.uniquindio.proyecto.modelo.Cliente;
-import co.edu.uniquindio.proyecto.modelo.EstadoRegistro;
+import co.edu.uniquindio.proyecto.dto.NegocioDTO.ItemNegocioDTO;
+import co.edu.uniquindio.proyecto.exceptions.ResourceNotFoundException;
+import co.edu.uniquindio.proyecto.modelo.*;
 import co.edu.uniquindio.proyecto.servicios.interfaces.ClienteServicio;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
@@ -50,7 +50,7 @@ public class ClienteServicioImpl implements ClienteServicio {
         }else {
             cliente.setEmail( registroClienteDTO.email() );
         }
-        if (!validarPatronContrasenia(registroClienteDTO.password())){
+        if (!validarContrasenia(registroClienteDTO.password())){
             throw new Exception("La contraseña no cumple con las características indicadas");
         }else {
             cliente.setPassword(registroClienteDTO.password());
@@ -74,14 +74,9 @@ public class ClienteServicioImpl implements ClienteServicio {
         return clienteRepo.findBynickName(nickName).isPresent();
     }
 
-    private boolean validarPatronContrasenia(String contrasenia) {
-        // Patrón para validar la contraseña
+    private boolean validarContrasenia(String contrasenia) {
         String patron = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
-        // Compilamos el patrón
-        Pattern pattern = Pattern.compile(patron);
-        // Creamos un matcher con la contraseña dada
-        Matcher matcher = pattern.matcher(contrasenia);
-        return matcher.matches();
+        return Pattern.matches(patron, contrasenia);
     }
 
     @Override
@@ -129,7 +124,7 @@ public class ClienteServicioImpl implements ClienteServicio {
         Cliente cliente = optionalCliente.get();
     //Retornamos el cliente en formato DTO
         return new DetalleClienteDTO(cliente.getCodigo(), cliente.getNombre(),
-                cliente.getFotoPerfil(), cliente.getNickName(), cliente.getEmail(), cliente.getCiudad());
+                cliente.getFotoPerfil(), cliente.getNickName(), cliente.getEmail(), cliente.getCiudad(), cliente.getUbicacion());
     }
     @Override
     public List<ItemClienteDTO> listarClientes() {
@@ -144,5 +139,141 @@ public class ClienteServicioImpl implements ClienteServicio {
         }
         return items;
     }
+
+    @Override
+    public String agregarNegocioFavorito(String idCliente, String idNegocio) throws Exception {
+        // Verificar que el negocio exista en la base de datos
+        Negocio negocio = negocioRepo.findById(idNegocio)
+                .orElseThrow(() -> new ResourceNotFoundException("El negocio que desea agregar a la lista de favoritos no se encuentra registrado en la base de datos."));
+        // Verificar si el usuario existe
+        Cliente cliente = clienteRepo.findById(idCliente)
+                .orElseThrow(() -> new ResourceNotFoundException("El cliente no existe."));
+        // Inicializar la lista de favoritos si es nula
+        if (cliente.getNegociosFavoritos() == null) {
+            cliente.setNegociosFavoritos(new ArrayList<>());
+        }
+        // Inicializar la lista de registros de búsqueda si es nula
+        if (cliente.getRegistroBusquedas() == null) {
+            cliente.setRegistroBusquedas(new ArrayList<>());
+        }
+        // Agregar el negocio a la lista de favoritos
+        cliente.getNegociosFavoritos().add(idNegocio);
+        // Agregar el nombre del negocio a la lista de registros de búsqueda
+        cliente.getRegistroBusquedas().add(obtenerNombreNegocioById(idNegocio));
+        // Guardar los cambios en la base de datos
+        clienteRepo.save(cliente);
+        return idNegocio;
+    }
+
+    private String obtenerNombreNegocioById(String idNegocio) throws Exception {
+
+        Optional<Negocio> negocioOptional = negocioRepo.findById(idNegocio);
+        if (negocioOptional.isEmpty()){
+            throw new Exception("Error al obtener el negocio con el id "+idNegocio);
+        }
+        Negocio negocio = negocioOptional.get();
+        return negocio.getNombre();
+    }
+
+    @Override
+    public String eliminarNegocioFavorito(String idCliente, String idNegocio) throws ResourceNotFoundException {
+        if (!negocioRepo.existsById(idNegocio)){
+            throw new ResourceNotFoundException("El negocio que desea eliminar de la lista de favoritos no se encuentra registrado en la base de datos.");
+        }
+        Optional<Cliente> optionalCliente = validarUsuarioExiste(idCliente);
+        Cliente cliente = optionalCliente.get();
+        cliente.getNegociosFavoritos().remove(idNegocio);
+        clienteRepo.save(cliente);
+        return idNegocio;
+    }
+
+    private Optional<Cliente> validarUsuarioExiste(String idCliente) throws ResourceNotFoundException{
+        //Buscamos el usuario que se quiere manipular
+        Optional<Cliente> optionalCliente = clienteRepo.findById(idCliente);
+
+        //Si no se encontró el usuario, lanzamos una excepción
+        if(optionalCliente.isEmpty()){
+            throw new ResourceNotFoundException("Usuario no encontrado.");
+        }
+        return optionalCliente;
+    }
+
+    public List<ItemNegocioDTO> listarNegociosFavoritos(String idUsuario) throws ResourceNotFoundException {
+        // Validar si el usuario existe
+        Cliente usuario = validarUsuarioExistente(idUsuario);
+
+        // Obtener la lista de negocios favoritos del usuario
+        List<Negocio> listaNegocios = negocioRepo.ListarFavoritos(idUsuario);
+        // Verificar si la lista de negocios favoritos está vacía
+        if (listaNegocios.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontraron negocios favoritos para el usuario con ID: " + idUsuario);
+        }
+        // Convertir la lista de negocios a una lista de DTOs
+        List<ItemNegocioDTO> items = convertirNegociosADTOs(listaNegocios);
+
+        return items;
+    }
+
+    private Cliente validarUsuarioExistente(String idUsuario) throws ResourceNotFoundException {
+        return clienteRepo.findById(idUsuario)
+                .orElseThrow(() -> new ResourceNotFoundException("El usuario con ID: " + idUsuario + " no existe."));
+    }
+
+    private List<ItemNegocioDTO> convertirNegociosADTOs(List<Negocio> listaNegocios) {
+        List<ItemNegocioDTO> items = new ArrayList<>();
+        for (Negocio negocio : listaNegocios) {
+            ItemNegocioDTO itemDTO = new ItemNegocioDTO(
+                    negocio.getCodigo(),
+                    negocio.getNombre(),
+                    negocio.getListImagenes(),
+                    negocio.getTipoNegocio(),
+                    negocio.getUbicacion()
+            );
+            items.add(itemDTO);
+        }
+        return items;
+    }
+
+    @Override
+    public void actualizarUbicacion(String idCliente, double longitud, double latitud) throws Exception {
+        Optional<Cliente> optionalUsuario = validarUsuarioExiste(idCliente);
+        Cliente cliente = optionalUsuario.get();
+        cliente.setUbicacion(new Ubicacion(latitud,longitud));
+        clienteRepo.save(cliente);
+    }
+
+    @Override
+    public double solicitarRuta(String idUsuario, Ubicacion ubicacionDestino, TipoMedioTransporte medioTransporte) throws ResourceNotFoundException {
+        Optional<Cliente> optionalCliente = validarUsuarioExiste(idUsuario);
+        Cliente cliente = optionalCliente.get();
+        double distancia = calcularDistancia(cliente.getUbicacion().getLatitud(),
+                cliente.getUbicacion().getLongitud(),ubicacionDestino.getLatitud(),
+                ubicacionDestino.getLongitud());
+        return distancia;
+    }
+
+    public static double calcularDistancia(double latitudUsuario, double longitudUsuario, double latitudNegocio, double longitudNegocio) {
+        final double RADIO_TIERRA = 6371; // Radio de la Tierra en kilómetros
+
+        // Convertir las coordenadas de grados a radianes
+        double latitudUsuarioRad = Math.toRadians(latitudUsuario);
+        double longitudUsuarioRad = Math.toRadians(longitudUsuario);
+        double latitudNegocioRad = Math.toRadians(latitudNegocio);
+        double longitudNegocioRad = Math.toRadians(longitudNegocio);
+
+        // Calcular las diferencias de latitud y longitud
+        double diferenciaLatitud = latitudNegocioRad - latitudUsuarioRad;
+        double diferenciaLongitud = longitudNegocioRad - longitudUsuarioRad;
+
+        // Calcular la distancia utilizando la fórmula de la distancia haversine
+        double a = Math.pow(Math.sin(diferenciaLatitud / 2), 2) +
+                Math.cos(latitudUsuarioRad) * Math.cos(latitudNegocioRad) *
+                        Math.pow(Math.sin(diferenciaLongitud / 2), 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distancia = RADIO_TIERRA * c;
+
+        return distancia;
+    }
+
 
 }

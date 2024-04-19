@@ -20,11 +20,12 @@ public interface ClienteServicio {
     void eliminarCliente(String idCuenta)throws Exception;
 
     //----------------------------------------------------
-
+    List<ItemClienteDTO> listarClientes();
     String agregarNegocioFavorito(String idCliente, String idNegocio) throws Exception;
     String eliminarNegocioFavorito(String idCliente, String idNegocio) throws ResourceNotFoundException;
     List<ItemNegocioDTO> listarNegociosFavoritos(String idCliente) throws Exception;
     void actualizarUbicacion(String idCliente,double longitud, double latitud) throws Exception;
     double solicitarRuta(String idUsuario, Ubicacion ubicacionDestino, TipoMedioTransporte medioTransporte) throws ResourceNotFoundException;
+
 
 }

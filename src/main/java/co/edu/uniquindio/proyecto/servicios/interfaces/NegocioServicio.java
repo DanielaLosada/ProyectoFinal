@@ -22,7 +22,6 @@ public interface NegocioServicio {
     //BUSQUEDAS--------------------------------------------
     DetalleNegocioDTO filtarNegocioNombre(String nombreNegocio) throws Exception;
     List<ItemNegocioDTO> filtarNegocioTipo(TipoNegocio tipoNegocio) throws Exception;
-    List<ItemNegocioDTO> filtrarNegocioPorDistancia(String idUsuario,int distanciaAlrededor) throws Exception;
     List<ItemNegocioDTO> filtrarNegocioEstado (EstadoNegocio estadoNegocio) throws Exception;
 
 

@@ -16,4 +16,7 @@ public class Ubicacion {
     private double  longitud;
     private List<Ruta> listRutas;
 
+
+    public Ubicacion(double latitud, double longitud) {
+    }
 }
