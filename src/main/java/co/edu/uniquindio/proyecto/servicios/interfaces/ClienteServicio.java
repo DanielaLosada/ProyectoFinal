@@ -25,7 +25,8 @@ public interface ClienteServicio {
     String eliminarNegocioFavorito(String idCliente, String idNegocio) throws ResourceNotFoundException;
     List<ItemNegocioDTO> listarNegociosFavoritos(String idCliente) throws Exception;
     void actualizarUbicacion(String idCliente,double longitud, double latitud) throws Exception;
-    double solicitarRuta(String idUsuario, Ubicacion ubicacionDestino, TipoMedioTransporte medioTransporte) throws ResourceNotFoundException;
+    double solicitarRuta(String idCliente, Ubicacion ubicacionDestino, TipoMedioTransporte medioTransporte) throws ResourceNotFoundException;
 
+    List<ItemNegocioDTO> recomendarLugares(String idCliente) throws Exception;
 
 }

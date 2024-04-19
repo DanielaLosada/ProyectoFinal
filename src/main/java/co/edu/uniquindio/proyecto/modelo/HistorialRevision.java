@@ -3,10 +3,9 @@ package co.edu.uniquindio.proyecto.modelo;
 import lombok.*;
 
 import java.time.LocalDateTime;
+@AllArgsConstructor
 @Getter
 @Setter
-@ToString
-@AllArgsConstructor
 @NoArgsConstructor
 public class HistorialRevision {
     private String descripcion;
@@ -19,4 +18,6 @@ public class HistorialRevision {
         this.estado = estadoNegocio;
     }
 
+    public HistorialRevision(String s, String descripcion, String s1, LocalDateTime now, EstadoNegocio estadoNegocio) {
+    }
 }

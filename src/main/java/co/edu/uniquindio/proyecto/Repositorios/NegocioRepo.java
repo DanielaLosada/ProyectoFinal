@@ -34,4 +34,8 @@ public interface NegocioRepo extends MongoRepository<Negocio, String > {
             "{$unwind: '$negocio_favorito'}",
             "{$project: { _id: 0, negociosFavoritos: '$negocio_favorito'}}"})
     List<Negocio> ListarFavoritos(String idUsuario);
+
+    @Query (value = "{ 'nombre' : { $regex : ?0, $options: 'i' } }" )
+    List<Object> busquedaNombresSimilares(String lugar);
+
 }

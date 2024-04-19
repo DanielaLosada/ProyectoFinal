@@ -34,10 +34,10 @@ public class NegocioServicioImpl implements NegocioServicio {
         negocio.setListImagenes(registroNegocioDTO.listImagenes());
         negocio.setListTelefonos(registroNegocioDTO.listTelefonos());
         negocio.setUbicacion(registroNegocioDTO.ubicacion());
-        if(!validarEstadoRegistroCliente(registroNegocioDTO.idCliente())){
+        if(!validarEstadoRegistroCliente(registroNegocioDTO.codigoCliente())){
             throw new Exception("No se pudo crear el negocio, el estado del cliente es inválido");
         }
-        negocio.setCodigoCliente(registroNegocioDTO.idCliente());
+        negocio.setCodigoCliente(registroNegocioDTO.codigoCliente());
         negocio.setListHorarios(registroNegocioDTO.listHorarios());
         negocio.setTipoNegocio(registroNegocioDTO.tipoNegocio());
         negocio.setListHistorialRevisiones(List.of(new HistorialRevision( LocalDateTime.now(), EstadoNegocio.PENDIENTE)));

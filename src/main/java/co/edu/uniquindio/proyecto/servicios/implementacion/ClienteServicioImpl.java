@@ -275,5 +275,30 @@ public class ClienteServicioImpl implements ClienteServicio {
         return distancia;
     }
 
+    @Override
+    public List<ItemNegocioDTO> recomendarLugares(String idCliente) throws Exception {
+        Optional<Cliente> clienteOptional = clienteRepo.findById(idCliente);
+        if (clienteOptional.isEmpty()) {
+            throw new Exception("Error al buscar el usuario con el id " + idCliente);
+        }
+        Cliente cliente = clienteOptional.get();
+        //Obtenemos las busquedas del usuario
+        List<String> listaLugares = cliente.getRegistroBusquedas();
+        return obtenerLugaresRecomendados(listaLugares);
+    }
+
+    private List<ItemNegocioDTO> obtenerLugaresRecomendados(List<String> listaLugares) throws ResourceNotFoundException {
+        List<Negocio> listaNegocios = new ArrayList<>();
+        for (String lugar: listaLugares) {
+            if (!listaNegocios.contains(negocioRepo.busquedaNombresSimilares(lugar).get(0))) {
+                listaNegocios.add((Negocio) negocioRepo.busquedaNombresSimilares(lugar).get(0));}
+        }
+        List<ItemNegocioDTO> itemNegocioDTOList = new ArrayList<>();
+        for (Negocio negocio : listaNegocios) {
+            itemNegocioDTOList.add(new ItemNegocioDTO(negocio.getCodigo(), negocio.getNombre(), negocio.getListImagenes(), negocio.getTipoNegocio(), negocio.getUbicacion()));
+        }
+        return itemNegocioDTOList;
+    }
+
 
 }
