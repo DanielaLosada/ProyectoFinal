@@ -22,6 +22,7 @@ public class Reserva implements Serializable {
     @EqualsAndHashCode.Include
     private String codigo;
     private String codigoCliente;
+    private String codigoNegocio;
     private LocalDateTime fecha;
     private LocalTime hora;
     private double costo;

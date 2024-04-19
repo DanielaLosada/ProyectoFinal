@@ -22,7 +22,6 @@ import java.util.Map;
 
 @Component
 public class JWTUtils {
-
     public String generarToken(String email, Map<String, Object> claims){
         Instant now = Instant.now();
         return Jwts.builder()

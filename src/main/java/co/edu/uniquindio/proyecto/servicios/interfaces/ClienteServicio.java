@@ -6,6 +6,8 @@ import co.edu.uniquindio.proyecto.dto.ClienteDTO.ItemClienteDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.RegistroClienteDTO;
 import co.edu.uniquindio.proyecto.dto.NegocioDTO.ItemNegocioDTO;
 import co.edu.uniquindio.proyecto.exceptions.ResourceNotFoundException;
+import co.edu.uniquindio.proyecto.modelo.TipoMedioTransporte;
+import co.edu.uniquindio.proyecto.modelo.Ubicacion;
 
 import java.util.List;
 
@@ -22,8 +24,7 @@ public interface ClienteServicio {
     String agregarNegocioFavorito(String idCliente, String idNegocio) throws Exception;
     String eliminarNegocioFavorito(String idCliente, String idNegocio) throws ResourceNotFoundException;
     List<ItemNegocioDTO> listarNegociosFavoritos(String idCliente) throws Exception;
-
-
-
+    void actualizarUbicacion(String idCliente,double longitud, double latitud) throws Exception;
+    double solicitarRuta(String idUsuario, Ubicacion ubicacionDestino, TipoMedioTransporte medioTransporte) throws ResourceNotFoundException;
 
 }

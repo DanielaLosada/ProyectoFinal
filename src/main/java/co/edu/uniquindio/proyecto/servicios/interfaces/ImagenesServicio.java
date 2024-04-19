@@ -6,5 +6,6 @@ import java.util.Map;
 
 public interface ImagenesServicio {
     Map subiImagen(MultipartFile imagen) throws Exception;
+
     Map eliminarImagen(String idImagen) throws Exception;
 }

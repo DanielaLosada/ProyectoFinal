@@ -1,4 +1,8 @@
 package co.edu.uniquindio.proyecto.dto;
 
-public record ItemModeradorDTO() {
+public record ItemModeradorDTO(
+        String codigo,
+        String nombre
+
+) {
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class EmailServicioImpl implements EmailService {
+
     private final JavaMailSender javaMailSender;
     @Override
     public void enviarCorreo(EmailDTO emailDTO) throws Exception {
@@ -19,7 +20,7 @@ public class EmailServicioImpl implements EmailService {
         helper.setSubject(emailDTO.asunto());
         helper.setText(emailDTO.cuerpo(), true);
         helper.setTo(emailDTO.destinatario());
-        helper.setFrom("unilocal2024@gmail.com");
+        helper.setFrom("unilocalhelp@gmail.com");
         javaMailSender.send(mensaje);
     }
 }
