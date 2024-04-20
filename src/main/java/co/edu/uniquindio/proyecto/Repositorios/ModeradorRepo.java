@@ -11,5 +11,5 @@ import java.util.Optional;
 @Repository
 public interface ModeradorRepo extends MongoRepository<Moderador,String> {
     Optional<Moderador> findByIdModerador(String idModerador);
-    Optional<Cuenta> findByCorreo(String correo);
+    Optional<Cuenta> findByEmail(String email);
 }

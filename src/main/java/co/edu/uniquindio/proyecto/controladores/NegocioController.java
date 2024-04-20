@@ -54,11 +54,7 @@ public class NegocioController {
         return ResponseEntity.ok().body(new MensajeDTO<>(false,negocioServicio.filtarNegocioNombre(nombreNegocio)));
     }
 
-    @GetMapping("/buscar-negocio/{nombreNegocio}")
-    public ResponseEntity<MensajeDTO<DetalleNegocioDTO>> buscarNegocioPorNombre(@PathVariable String nombreNegocio)throws Exception{
-        return ResponseEntity.ok().body(new MensajeDTO<>(false,negocioServicio.filtarNegocioNombre(nombreNegocio)));
-    }
-    @GetMapping("/buscar-negocios-tipo")
+    @GetMapping("/buscar-negocios-tipo/{tipoNegocio}")
     public ResponseEntity<MensajeDTO<List<ItemNegocioDTO>>> buscarNegociosPorTipo(@Valid @RequestBody TipoNegocio tipoNegocio) throws Exception{
         return ResponseEntity.ok().body(new MensajeDTO<>(false,negocioServicio.filtarNegocioTipo(tipoNegocio)));
     }

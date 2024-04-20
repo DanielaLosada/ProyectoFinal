@@ -7,6 +7,7 @@ import co.edu.uniquindio.proyecto.dto.NegocioDTO.RegistroNegocioDTO;
 import co.edu.uniquindio.proyecto.dto.ReservaDTO.ActualizarReservaDTO;
 import co.edu.uniquindio.proyecto.dto.ReservaDTO.ItemReservaDTO;
 import co.edu.uniquindio.proyecto.dto.ReservaDTO.RegistroReservaDTO;
+import co.edu.uniquindio.proyecto.servicios.interfaces.ClienteServicio;
 import co.edu.uniquindio.proyecto.servicios.interfaces.ReservaServicio;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +21,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReservaController {
     private final ReservaServicio reservaServicio;
+    private final ClienteServicio clienteServicio;
 
     @PostMapping("/registrar-reserva")
-    public ResponseEntity<MensajeDTO<String>> crearReserva(@Valid @RequestBody RegistroReservaDTO registroReservaDTO) throws Exception{
-        reservaServicio.crearReserva(registroReservaDTO);
+    public ResponseEntity<MensajeDTO<String>> crearReserva(@Valid @RequestBody RegistroReservaDTO registroReservaDTO, String idCliente, String idNegocio) throws Exception{
+        clienteServicio.crearReserva(registroReservaDTO, idCliente, idNegocio);
         return ResponseEntity.ok().body(new MensajeDTO<>(false,"La reserva se creo correctamente"));
     }
 
@@ -33,9 +35,9 @@ public class ReservaController {
         return ResponseEntity.ok().body(new MensajeDTO<>(false,"Reserva eliminado correctamente."));
     }
 
-    @PutMapping("/editar-reserva")
-    public ResponseEntity<MensajeDTO<String>> actualizarReserva(@Valid @RequestBody ActualizarReservaDTO actualizarReservaDTO) throws Exception{
-        reservaServicio.actualizarReserva(actualizarReservaDTO);
+    @PutMapping("/editar-reserva/{idReserva}")
+    public ResponseEntity<MensajeDTO<String>> actualizarReserva(@Valid @RequestBody ActualizarReservaDTO actualizarReservaDTO, String idReserva) throws Exception{
+        reservaServicio.actualizarReserva(actualizarReservaDTO, idReserva);
         return ResponseEntity.ok().body(new MensajeDTO<>(false,"Reserva actualizado con éxito."));
     }
 

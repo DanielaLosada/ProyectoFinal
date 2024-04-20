@@ -30,9 +30,9 @@ public class ReseniaServicioImpl implements ReseniaServicio {
         resenia.setCodigoCliente(registroReseniaDTO.idUsuario());
         resenia.setCodigoNegocio(registroReseniaDTO.idNegocio());
         resenia.setFecha(LocalDateTime.now());
-        Resenia reseniaGuardado=reseniaRepo.save(resenia);
+        Resenia reseniaGuardada= reseniaRepo.save(resenia);
 
-        return reseniaGuardado.getCodigo();
+        return reseniaGuardada.getCodigo();
     }
 
     @Override

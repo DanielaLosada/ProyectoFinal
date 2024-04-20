@@ -75,7 +75,6 @@ public class NegocioServicioImpl implements NegocioServicio {
         negocio.setDescripcion(actualizarNegocioDTO.descripcion());
         negocio.setListImagenes(actualizarNegocioDTO.listImagenes());
         negocio.setListTelefonos(actualizarNegocioDTO.listTelefonos());
-
         negocioRepo.save(negocio);
     }
 
@@ -129,7 +128,7 @@ public class NegocioServicioImpl implements NegocioServicio {
 
     @Override
     public List<ItemNegocioDTO> listarNegocioPropietario(String idCliente) throws Exception {
-        List<Negocio> listaNegocios = negocioRepo.listarNegocioPropietario(idCliente); //Hacer consulta que traiga todos los negocios del usuario indicado por parámetro
+        List<Negocio> listaNegocios = negocioRepo.findNegocioByCodigoCliente(idCliente); //Hacer consulta que traiga todos los negocios del usuario indicado por parámetro
 
         if (listaNegocios.isEmpty()){
             throw new ResourceNotFoundException("Error al momento de obtener los negocios relacionados al propietario "+idCliente);

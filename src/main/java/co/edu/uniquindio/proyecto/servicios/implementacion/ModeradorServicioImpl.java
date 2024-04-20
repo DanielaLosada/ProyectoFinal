@@ -35,7 +35,7 @@ public class ModeradorServicioImpl implements ModeradorServicio {
         }
         Moderador moderador= optionalModerador.get();
 
-        return new ItemModeradorDTO(moderador.getCodigo() ,moderador.getNombre());
+        return new ItemModeradorDTO(moderador.getIdModerador() ,moderador.getNombre());
     }
 
     @Override

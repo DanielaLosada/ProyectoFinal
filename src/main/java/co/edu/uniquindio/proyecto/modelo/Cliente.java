@@ -25,6 +25,7 @@ public class Cliente extends Cuenta   implements Serializable {
     private Ubicacion ubicacion;
     private List<String> registroBusquedas;
     private List <String> negociosFavoritos;
+    private List <Reserva> reservas;
 
 
 

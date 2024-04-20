@@ -1,9 +1,6 @@
 package co.edu.uniquindio.proyecto.Repositorios;
 
-import co.edu.uniquindio.proyecto.modelo.EstadoNegocio;
-import co.edu.uniquindio.proyecto.modelo.EstadoRegistro;
-import co.edu.uniquindio.proyecto.modelo.Negocio;
-import co.edu.uniquindio.proyecto.modelo.TipoNegocio;
+import co.edu.uniquindio.proyecto.modelo.*;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -22,20 +19,15 @@ public interface NegocioRepo extends MongoRepository<Negocio, String > {
     @Query (value = "{'estadoRegistro' :  ?0}")
     List<Negocio> ListarNegocioPorER(EstadoRegistro estadoRegistro);
 
-    @Query (value = "{'historialNegocio.estadoNegocio' : ?0 }")
+    @Query (value = "{'listHistorialRevisiones.estado' : ?0 }")
     List<Negocio> ListarNegocioEstado(EstadoNegocio estadoNegocio);
 
-    @Query (value = "{'idCliente' :  ?0}" )
-    List<Negocio> listarNegocioPropietario(String idCliente);
-
-    @Aggregation({
-            "{$match: {_id: ?0}}",
-            "{$lookup: {from: 'negocio', localField: 'negociosFavoritos', foreignField: '_id', as: 'negocio_favorito'}}",
-            "{$unwind: '$negocio_favorito'}",
-            "{$project: { _id: 0, negociosFavoritos: '$negocio_favorito'}}"})
-    List<Negocio> ListarFavoritos(String idUsuario);
+    List<Negocio> findNegocioByCodigoCliente(String idCliente);
 
     @Query (value = "{ 'nombre' : { $regex : ?0, $options: 'i' } }" )
     List<Object> busquedaNombresSimilares(String lugar);
+
+    @Query(value="{ '_id': ?0 }", fields="{ 'listReservas': 1 }")
+    List<Reserva> listarReservaNegocio(String idNegocio);
 
 }

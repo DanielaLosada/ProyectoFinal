@@ -3,11 +3,14 @@ package co.edu.uniquindio.proyecto.servicios.implementacion;
 
 import co.edu.uniquindio.proyecto.Repositorios.ClienteRepo;
 import co.edu.uniquindio.proyecto.Repositorios.NegocioRepo;
+import co.edu.uniquindio.proyecto.Repositorios.ReservaRepo;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.ActualizarClienteDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.DetalleClienteDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.ItemClienteDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.RegistroClienteDTO;
 import co.edu.uniquindio.proyecto.dto.NegocioDTO.ItemNegocioDTO;
+import co.edu.uniquindio.proyecto.dto.ReservaDTO.ItemReservaDTO;
+import co.edu.uniquindio.proyecto.dto.ReservaDTO.RegistroReservaDTO;
 import co.edu.uniquindio.proyecto.exceptions.ResourceNotFoundException;
 import co.edu.uniquindio.proyecto.modelo.*;
 import co.edu.uniquindio.proyecto.servicios.interfaces.ClienteServicio;
@@ -31,6 +34,7 @@ import java.util.regex.Pattern;
 public class ClienteServicioImpl implements ClienteServicio {
     private final ClienteRepo clienteRepo;
     private final NegocioRepo negocioRepo;
+    private final ReservaRepo reservaRepo;
 
     @Override
     public String registrarCliente(RegistroClienteDTO registroClienteDTO) throws Exception {
@@ -165,6 +169,31 @@ public class ClienteServicioImpl implements ClienteServicio {
         return idNegocio;
     }
 
+    public String crearReserva(RegistroReservaDTO registroReservaDTO, String idCliente, String idNegocio) throws Exception {
+        Reserva reserva = new Reserva();
+        reserva.setCodigoCliente(registroReservaDTO.codigoCliente());
+        reserva.setCodigoNegocio(registroReservaDTO.codigoNegocio());
+        reserva.setHora(registroReservaDTO.hora());
+        reserva.setCosto(registroReservaDTO.costo());
+        reserva.setFecha(registroReservaDTO.fecha());
+        Cliente cliente = clienteRepo.findById(idCliente)
+                .orElseThrow(() -> new ResourceNotFoundException("El cliente no existe."));
+        if (cliente.getReservas() == null) {
+            cliente.setReservas(new ArrayList<>());
+        }
+        cliente.getReservas().add(reserva);
+        clienteRepo.save(cliente);
+        Negocio negocio= negocioRepo.findById(idNegocio)
+                .orElseThrow(() -> new ResourceNotFoundException("El negocio no existe."));
+        if (negocio.getListReservas() == null) {
+            negocio.setListReservas(new ArrayList<>());
+        }
+        negocio.getListReservas().add(reserva);
+        negocioRepo.save(negocio);
+        Reserva reservaGuardado = reservaRepo.save(reserva);
+        return reservaGuardado.getCodigo();
+    }
+
     private String obtenerNombreNegocioById(String idNegocio) throws Exception {
 
         Optional<Negocio> negocioOptional = negocioRepo.findById(idNegocio);
@@ -198,19 +227,16 @@ public class ClienteServicioImpl implements ClienteServicio {
         return optionalCliente;
     }
 
-    public List<ItemNegocioDTO> listarNegociosFavoritos(String idUsuario) throws ResourceNotFoundException {
-        // Validar si el usuario existe
-        Cliente usuario = validarUsuarioExistente(idUsuario);
-
+    public List<ItemNegocioDTO> listarNegociosFavoritos(String idCliente) throws ResourceNotFoundException {
+        Cliente cliente = validarUsuarioExistente(idCliente);
         // Obtener la lista de negocios favoritos del usuario
-        List<Negocio> listaNegocios = negocioRepo.ListarFavoritos(idUsuario);
+        List<Negocio> listaNegocios = clienteRepo.ListarFavoritos(idCliente);
         // Verificar si la lista de negocios favoritos está vacía
         if (listaNegocios.isEmpty()) {
-            throw new ResourceNotFoundException("No se encontraron negocios favoritos para el usuario con ID: " + idUsuario);
+            throw new ResourceNotFoundException("No se encontraron negocios favoritos para el usuario con ID: " + idCliente);
         }
         // Convertir la lista de negocios a una lista de DTOs
         List<ItemNegocioDTO> items = convertirNegociosADTOs(listaNegocios);
-
         return items;
     }
 
@@ -254,24 +280,20 @@ public class ClienteServicioImpl implements ClienteServicio {
 
     public static double calcularDistancia(double latitudUsuario, double longitudUsuario, double latitudNegocio, double longitudNegocio) {
         final double RADIO_TIERRA = 6371; // Radio de la Tierra en kilómetros
-
         // Convertir las coordenadas de grados a radianes
         double latitudUsuarioRad = Math.toRadians(latitudUsuario);
         double longitudUsuarioRad = Math.toRadians(longitudUsuario);
         double latitudNegocioRad = Math.toRadians(latitudNegocio);
         double longitudNegocioRad = Math.toRadians(longitudNegocio);
-
         // Calcular las diferencias de latitud y longitud
         double diferenciaLatitud = latitudNegocioRad - latitudUsuarioRad;
         double diferenciaLongitud = longitudNegocioRad - longitudUsuarioRad;
-
         // Calcular la distancia utilizando la fórmula de la distancia haversine
         double a = Math.pow(Math.sin(diferenciaLatitud / 2), 2) +
                 Math.cos(latitudUsuarioRad) * Math.cos(latitudNegocioRad) *
                         Math.pow(Math.sin(diferenciaLongitud / 2), 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double distancia = RADIO_TIERRA * c;
-
         return distancia;
     }
 
@@ -298,6 +320,23 @@ public class ClienteServicioImpl implements ClienteServicio {
             itemNegocioDTOList.add(new ItemNegocioDTO(negocio.getCodigo(), negocio.getNombre(), negocio.getListImagenes(), negocio.getTipoNegocio(), negocio.getUbicacion()));
         }
         return itemNegocioDTOList;
+    }
+
+    @Override
+    public List<ItemReservaDTO> listarReservasXCliente(String idCliente) throws Exception {
+        List<Reserva> listaReserva = clienteRepo.listarReservaCliente(idCliente); //Hacer consulta que traiga todos los negocios del usuario indicado por parámetro
+
+        if (listaReserva.isEmpty()){
+            throw new ResourceNotFoundException("Error al momento de obtener las reservas relacionadas al cliente "+idCliente);
+        }
+
+        List<ItemReservaDTO> items = new ArrayList<>();
+
+        for(Reserva reserva : listaReserva){
+            items.add(new ItemReservaDTO(reserva.getCodigo(), reserva.getCodigoCliente(), reserva.getCodigoNegocio(),
+                    reserva.getFecha(), reserva.getHora()));
+        }
+        return items;
     }
 
 

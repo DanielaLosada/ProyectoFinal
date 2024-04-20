@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public record RegistroReservaDTO(
-        @NotBlank @Length(max = 100) String codigo,
         @NotBlank String codigoCliente,
         @NotBlank String codigoNegocio,
         @NotBlank LocalDateTime fecha,

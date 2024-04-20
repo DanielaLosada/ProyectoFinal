@@ -16,15 +16,15 @@ public class ModeradorServicioTest {
 
     @Test
     public void obtenerDatosTest() throws Exception{
-        Assertions.assertNotNull(moderadorServicio.obtenerInfoModerador("Moderador#1"));
+        Assertions.assertNotNull(moderadorServicio.obtenerInfoModerador("6622e7b7f206fe603f114bdf"));
     }
 
     @Test
     public void aprobarTest() throws Exception{
         RevisionNegocioDTO revisionNegocioDTO = new RevisionNegocioDTO(
-                "661b30a613481c7f49a585b9",
+                "6622a1cb66aafa3801ec15f0",
                 "Excelente negocio innovaodr",
-                "Moderador#1"
+                "6622e7b7f206fe603f114bdf"
         );
         moderadorServicio.aprobarNegocio(revisionNegocioDTO);
         Assertions.assertNotNull(revisionNegocioDTO.idNegocio());
@@ -33,9 +33,9 @@ public class ModeradorServicioTest {
     @Test
     public void rechazarTest() throws Exception{
         RevisionNegocioDTO revisionNegocioDTO = new RevisionNegocioDTO(
-                "661b30a613481c7f49a585b9",
+                "6622a1ee2b00de270d9d23e3",
                 "No cumple con los requisitos",
-                "Moderador1"
+                "6622e7b7f206fe603f114bdf"
         );
         moderadorServicio.rechazarNegocio(revisionNegocioDTO);
         Assertions.assertNotNull(revisionNegocioDTO.idNegocio());

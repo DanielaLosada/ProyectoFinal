@@ -19,15 +19,13 @@ public class ReseniaServicioTest {
 
     @Test
     public void crearResenia() throws Exception{
-        List<String> imagenes = new ArrayList<>();
         RegistroReseniaDTO registroReseniaDTO = new RegistroReseniaDTO(
-                "Muy bueno",
-                5,
-                "Usuario2",
-                "Negocio3",
+                "regulas 3/4",
+                4,
+                "66229ef257c6c37d8b970b4e",
+                "6622a1ee2b00de270d9d23e3",
                 ""
         );
-
         String codigo = reseniaServicio.crearResenia(registroReseniaDTO);
         Assertions.assertNotNull(codigo);
     }
@@ -36,7 +34,7 @@ public class ReseniaServicioTest {
     public void responderResenia() throws Exception{
 
         ResponderReseniaDTO responderReseniaDTO = new ResponderReseniaDTO(
-                "661d620c5ea25a30e85b6cfd",
+                "6622aa837a9f3044d9b9dc43",
                 "Gracias"
         );
         reseniaServicio.responderResenia(responderReseniaDTO);

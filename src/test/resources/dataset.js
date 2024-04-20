@@ -1,5 +1,5 @@
 db = connect( 'mongodb://root:example@localhost:27017/UnilocalTest?authSource=admin' );
-db.usuario.insertMany([
+db.cliente.insertMany([
     {
         _id: 'Usuario1',
         nombre: 'Juan',
@@ -12,7 +12,7 @@ db.usuario.insertMany([
             latitud: 4.540130,
             longitud: -75.665660
         },
-        _class: 'co.edu.uniquindio.unilocal.model.Usuario'
+        _class: 'co.edu.uniquindio.unilocal.model.Cliente'
     },
     {
         _id: 'Usuario2',
@@ -26,7 +26,7 @@ db.usuario.insertMany([
             latitud: 4.540130,
             longitud: -75.665660
         },
-        _class: 'co.edu.uniquindio.unilocal.model.Usuario'
+        _class: 'co.edu.uniquindio.unilocal.model.Cliente'
     },
     {
         _id: 'Usuario3',
@@ -40,7 +40,7 @@ db.usuario.insertMany([
             latitud: 4.540130,
             longitud: -75.665660
         },
-        _class: 'co.edu.uniquindio.unilocal.model.Usuario'
+        _class: 'co.edu.uniquindio.unilocal.model.Cliente'
     },
     {
         _id: 'Usuario4',
@@ -54,7 +54,7 @@ db.usuario.insertMany([
             latitud: 4.540130,
             longitud: -75.665660
         },
-        _class: 'co.edu.uniquindio.unilocal.model.Usuario'
+        _class: 'co.edu.uniquindio.unilocal.model.Cliente'
     },
     {
         _id: 'Usuario5',
@@ -68,7 +68,7 @@ db.usuario.insertMany([
             latitud: 4.540130,
             longitud: -75.665660
         },
-        _class: 'co.edu.uniquindio.unilocal.model.Usuario'
+        _class: 'co.edu.uniquindio.unilocal.model.Cliente'
     }
 ]);
 db.negocio.insertMany([
@@ -183,24 +183,24 @@ db.negocio.insertMany([
         _class: 'co.edu.uniquindio.unilocal.model.Negocio'
     }
 ]);
-db.comentarios.insertMany([
+db.resenia.insertMany([
     {
         mensaje: "Excelente sitio, muy buena atención",
         fecha: new Date(),
         codigoCliente: 'Cliente1',
         codigoNegocio: 'Negocio1',
         calificacion: 5,
-        _class: 'co.edu.uniquindio.unilocal.model.Comentario'
+        _class: 'co.edu.uniquindio.unilocal.model.Resenia'
     }
 ]);
-db.comentario.insertMany([
+db.resenia.insertMany([
     {
         descripcion: "Excelente sitio, muy buena atención",
         calificacion: 5,
         idUsuario: 'Usuario2',
         idNegocio: 'Negocio4',
         respuesta: '',
-        _class: 'co.edu.uniquindio.unilocal.model.Comentario'
+        _class: 'co.edu.uniquindio.unilocal.model.Resenia'
     },
     {
         descripcion: "Excelente sitio, muy buena atención",
@@ -208,7 +208,7 @@ db.comentario.insertMany([
         idUsuario: 'Usuario1',
         idNegocio: 'Negocio5',
         respuesta: '',
-        _class: 'co.edu.uniquindio.unilocal.model.Comentario'
+        _class: 'co.edu.uniquindio.unilocal.model.Resenia'
     },
     {
         descripcion: "Mal servicio",
@@ -216,7 +216,7 @@ db.comentario.insertMany([
         idUsuario: 'Usuario3',
         idNegocio: 'Negocio2',
         respuesta: '',
-        _class: 'co.edu.uniquindio.unilocal.model.Comentario'
+        _class: 'co.edu.uniquindio.unilocal.model.Resenia'
     },
     {
         descripcion: "Excelente sitio, muy buena atención",
@@ -224,7 +224,7 @@ db.comentario.insertMany([
         idUsuario: 'Usuario4',
         idNegocio: 'Negocio1',
         respuesta: '',
-        _class: 'co.edu.uniquindio.unilocal.model.Comentario'
+        _class: 'co.edu.uniquindio.unilocal.model.Resenia'
     },
     {
         descripcion: "Excelente sitio, muy buena atención",
@@ -232,6 +232,16 @@ db.comentario.insertMany([
         idUsuario: 'Usuario5',
         idNegocio: 'Negocio3',
         respuesta: '',
-        _class: 'co.edu.uniquindio.unilocal.model.Comentario'
+        _class: 'co.edu.uniquindio.unilocal.model.Resenia'
     }
+]);
+    db.moderador.insertMany([
+        {
+            _id: 'Moderador1',
+            nombre: 'Ximena',
+            correo: 'angieXimena26@email.com',
+            contrasenia: '$2a$10$UhRcJ0mAXMKjBS3qBOMlDuYm7FZSPCj.Jr2fWZX05lGZUZgiLfrgG',
+            estadoRegistro: 'ACTIVA',
+            _class: 'co.edu.uniquindio.unilocal.model.Moderador'
+        },
 ]);

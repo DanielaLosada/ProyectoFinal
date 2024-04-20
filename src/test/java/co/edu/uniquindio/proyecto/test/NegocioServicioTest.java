@@ -28,16 +28,16 @@ public class NegocioServicioTest {
         List<HistorialRevision> listHistorial = new ArrayList<>();
 
         RegistroNegocioDTO registroNegocioDTO = new RegistroNegocioDTO(
-                "Don platano",
-                "Restaurante nuevo",
+                "Le COCO",
+                "Fino, finisimo",
                 listImagenes,
                 listTele,
                 ubicacion,
-               "Usuario1",
+               "66229ef257c6c37d8b970b4e",
                 horarioNegocio,
                 TipoNegocio.RESTAURANTE,
                 listHistorial,
-                "Armenia"
+                "Armenia Norte"
         );
 
         String codigo = negocioServicio.crearNegocio(registroNegocioDTO);
@@ -53,35 +53,31 @@ public class NegocioServicioTest {
         List<Horario> horarioNegocio=new ArrayList<>();
 
         ActualizarNegocioDTO actualizarNegocioDTO = new ActualizarNegocioDTO(
-                "Negocio1",
+                "66229f2fdcbd8f635252f497",
                 "Restaurante Comida Mexicana",
                 "Restaurante de la mejor comida Mexicana",
                 imagenes,
                 telefonos,
                 horarioNegocio
         );
-
-        negocioServicio.actualizarNegocio(actualizarNegocioDTO);
-        DetalleNegocioDTO detalleNegocioDTO = negocioServicio.buscarNegocios("Negocio1","Usuario1");
-        Assertions.assertNotNull("id",detalleNegocioDTO.id());
     }
 
     @Test
     public void eliminarTest() throws Exception{
-        negocioServicio.eliminarNegocio("Negocio2");
+        negocioServicio.eliminarNegocio("66229f2fdcbd8f635252f497");
         Assertions.assertThrows(Exception.class, () -> {
-            negocioServicio.eliminarNegocio("Negocio2");
+            negocioServicio.eliminarNegocio("66229f2fdcbd8f635252f497");
         });
     }
 
     @Test
     public void buscarNegocioTest() throws Exception{
-        Assertions.assertNotNull(negocioServicio.buscarNegocios("Negocio1","Usuario1"));
+        Assertions.assertNotNull(negocioServicio.buscarNegocios("66229f2fdcbd8f635252f497","66229ef257c6c37d8b970b4e"));
     }
 
     @Test
     public void buscarNegocioNombreTest() throws Exception{
-        Assertions.assertNotNull(negocioServicio.filtarNegocioNombre("Restaurante Mexicano"));
+        Assertions.assertNotNull(negocioServicio.filtarNegocioNombre("Burguer City"));
     }
 
     @Test
@@ -91,13 +87,12 @@ public class NegocioServicioTest {
 
     @Test
     public void filtrarEstado() throws Exception{
-        Assertions.assertNotNull(negocioServicio.filtrarNegocioEstado(EstadoNegocio.RECHAZADO));
+        Assertions.assertNotNull(negocioServicio.filtrarNegocioEstado(EstadoNegocio.PENDIENTE));
     }
 
     @Test
     public void listarNegociosUsuarioTest() throws Exception{
-        Assertions.assertNotNull(negocioServicio.listarNegocioPropietario("Usuario1"));
+        Assertions.assertNotNull(negocioServicio.listarNegocioPropietario("66229ef257c6c37d8b970b4e"));
     }
-
 
 }

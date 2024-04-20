@@ -7,6 +7,7 @@ import co.edu.uniquindio.proyecto.dto.LoginDTO;
 import co.edu.uniquindio.proyecto.dto.TokenDTO;
 import co.edu.uniquindio.proyecto.modelo.Cliente;
 import co.edu.uniquindio.proyecto.modelo.Cuenta;
+import co.edu.uniquindio.proyecto.modelo.Moderador;
 import co.edu.uniquindio.proyecto.servicios.interfaces.AutenticacionServicio;
 import co.edu.uniquindio.proyecto.util.JWTUtils;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class AutenticacionServicioImpl implements AutenticacionServicio {
 
     @Override
     public TokenDTO iniciarSesionCliente(LoginDTO loginDTO) throws Exception {
-        Optional<Cliente> usuarioOptional = usuarioRepo.findByEmail(loginDTO.correo());
+        Optional<Cliente> usuarioOptional = usuarioRepo.findByEmail(loginDTO.email());
         if (usuarioOptional.isEmpty()) {
             throw new Exception("El correo no se encuentra registrado");
         }
@@ -46,7 +47,7 @@ public class AutenticacionServicioImpl implements AutenticacionServicio {
 
     @Override
     public TokenDTO iniciarSesionModerador(LoginDTO loginDTO) throws Exception {
-        Optional<Cuenta> usuarioOptional = moderadorRepo.findByCorreo(loginDTO.correo());
+        Optional<Cuenta> usuarioOptional = moderadorRepo.findByEmail(loginDTO.email());
         if (usuarioOptional.isEmpty()) {
             throw new Exception("El correo no se encuentra registrado");
         }
