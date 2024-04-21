@@ -10,7 +10,7 @@ import java.util.List;
 public interface ReservaServicio {
     void eliminarReserva(String idReserva) throws Exception;
 
-    void actualizarReserva(ActualizarReservaDTO actualizarReservaDTO, String idReserva) throws Exception;
+    void actualizarReserva(ActualizarReservaDTO actualizarReservaDTO) throws Exception;
 
     List<ItemReservaDTO> listarReservasXCliente(String idCliente) throws Exception;
     List<ItemReservaDTO> listarReservasXNegocio(String idNegocio) throws Exception;

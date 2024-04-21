@@ -4,16 +4,19 @@ package co.edu.uniquindio.proyecto.servicios.implementacion;
 import co.edu.uniquindio.proyecto.Repositorios.ClienteRepo;
 import co.edu.uniquindio.proyecto.Repositorios.NegocioRepo;
 import co.edu.uniquindio.proyecto.Repositorios.ReservaRepo;
+import co.edu.uniquindio.proyecto.dto.CambioPasswordDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.ActualizarClienteDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.DetalleClienteDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.ItemClienteDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.RegistroClienteDTO;
+import co.edu.uniquindio.proyecto.dto.EmailDTO;
 import co.edu.uniquindio.proyecto.dto.NegocioDTO.ItemNegocioDTO;
 import co.edu.uniquindio.proyecto.dto.ReservaDTO.ItemReservaDTO;
 import co.edu.uniquindio.proyecto.dto.ReservaDTO.RegistroReservaDTO;
 import co.edu.uniquindio.proyecto.exceptions.ResourceNotFoundException;
 import co.edu.uniquindio.proyecto.modelo.*;
 import co.edu.uniquindio.proyecto.servicios.interfaces.ClienteServicio;
+import co.edu.uniquindio.proyecto.servicios.interfaces.EmailService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -21,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +39,7 @@ public class ClienteServicioImpl implements ClienteServicio {
     private final ClienteRepo clienteRepo;
     private final NegocioRepo negocioRepo;
     private final ReservaRepo reservaRepo;
+    private final EmailService emailService;
 
     @Override
     public String registrarCliente(RegistroClienteDTO registroClienteDTO) throws Exception {
@@ -161,29 +166,29 @@ public class ClienteServicioImpl implements ClienteServicio {
             cliente.setRegistroBusquedas(new ArrayList<>());
         }
         // Agregar el negocio a la lista de favoritos
-        cliente.getNegociosFavoritos().add(idNegocio);
+        cliente.getNegociosFavoritos().add(obtenerNombreNegocioById(idNegocio));
         // Agregar el nombre del negocio a la lista de registros de búsqueda
         cliente.getRegistroBusquedas().add(obtenerNombreNegocioById(idNegocio));
         // Guardar los cambios en la base de datos
         clienteRepo.save(cliente);
-        return idNegocio;
+        return idCliente;
     }
 
-    public String crearReserva(RegistroReservaDTO registroReservaDTO, String idCliente, String idNegocio) throws Exception {
+    public String crearReserva(RegistroReservaDTO registroReservaDTO) throws Exception {
         Reserva reserva = new Reserva();
         reserva.setCodigoCliente(registroReservaDTO.codigoCliente());
         reserva.setCodigoNegocio(registroReservaDTO.codigoNegocio());
         reserva.setHora(registroReservaDTO.hora());
         reserva.setCosto(registroReservaDTO.costo());
         reserva.setFecha(registroReservaDTO.fecha());
-        Cliente cliente = clienteRepo.findById(idCliente)
+        Cliente cliente = clienteRepo.findById(registroReservaDTO.codigoCliente())
                 .orElseThrow(() -> new ResourceNotFoundException("El cliente no existe."));
         if (cliente.getReservas() == null) {
             cliente.setReservas(new ArrayList<>());
         }
         cliente.getReservas().add(reserva);
         clienteRepo.save(cliente);
-        Negocio negocio= negocioRepo.findById(idNegocio)
+        Negocio negocio= negocioRepo.findById(registroReservaDTO.codigoNegocio())
                 .orElseThrow(() -> new ResourceNotFoundException("El negocio no existe."));
         if (negocio.getListReservas() == null) {
             negocio.setListReservas(new ArrayList<>());
@@ -217,27 +222,60 @@ public class ClienteServicioImpl implements ClienteServicio {
     }
 
     private Optional<Cliente> validarUsuarioExiste(String idCliente) throws ResourceNotFoundException{
-        //Buscamos el usuario que se quiere manipular
         Optional<Cliente> optionalCliente = clienteRepo.findById(idCliente);
-
-        //Si no se encontró el usuario, lanzamos una excepción
         if(optionalCliente.isEmpty()){
-            throw new ResourceNotFoundException("Usuario no encontrado.");
+            throw new ResourceNotFoundException("Se encontro una ruta correctamente ");
         }
         return optionalCliente;
     }
 
-    public List<ItemNegocioDTO> listarNegociosFavoritos(String idCliente) throws ResourceNotFoundException {
-        Cliente cliente = validarUsuarioExistente(idCliente);
-        // Obtener la lista de negocios favoritos del usuario
-        List<Negocio> listaNegocios = clienteRepo.ListarFavoritos(idCliente);
-        // Verificar si la lista de negocios favoritos está vacía
-        if (listaNegocios.isEmpty()) {
-            throw new ResourceNotFoundException("No se encontraron negocios favoritos para el usuario con ID: " + idCliente);
+    @Override
+    public CambioPasswordDTO recuperarContrasenia(String idCliente) throws Exception {
+        Optional<Cliente> optionalCliente = validarUsuarioExiste(idCliente);
+        String nuevaContra=generarNuevaContrasenia();
+
+        //Obtenemos el usuario que se quiere recuperar la contraseña y verifica su estado
+        Cliente cliente = optionalCliente.get();
+        if (cliente.getEstado().equals(EstadoRegistro.INACTIVO)){
+            throw new Exception("CUENTA CON ESTADO INVÁLIDO");
         }
-        // Convertir la lista de negocios a una lista de DTOs
-        List<ItemNegocioDTO> items = convertirNegociosADTOs(listaNegocios);
-        return items;
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        cliente.setPassword(passwordEncoder.encode(nuevaContra));
+        clienteRepo.save(cliente);
+        CambioPasswordDTO cambiarPasswordDTO = new CambioPasswordDTO(idCliente,nuevaContra,cliente.getEmail());
+        enviarCorreoRecuperacion(cambiarPasswordDTO);
+        return cambiarPasswordDTO;
+    }
+
+    private String generarNuevaContrasenia() {
+       String CARACTERES_PERMITIDOS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$!%*?&";
+        SecureRandom RANDOM = new SecureRandom();
+            StringBuilder contrasenia = new StringBuilder();
+
+            for (int i = 0; i < 8; i++) {
+                contrasenia.append(CARACTERES_PERMITIDOS.charAt(RANDOM.nextInt(CARACTERES_PERMITIDOS.length())));
+            }
+
+            return contrasenia.toString();
+    }
+
+    private void enviarCorreoRecuperacion(CambioPasswordDTO cambiarPasswordDTO) throws Exception {
+
+        emailService.enviarCorreo(new EmailDTO("RECUPERACIÓN DE CONTRASEÑA", "Su nueva contraseña es: "+cambiarPasswordDTO.passwordNueva(), cambiarPasswordDTO.email()));
+    }
+
+    @Override
+    public List<Negocio> listarNegociosFavoritos(String idCliente) throws Exception{
+
+        List<Negocio> listaNegocios = clienteRepo.ListarFavoritos(idCliente);
+        if (listaNegocios.isEmpty()){
+            throw new ResourceNotFoundException("Error al momento de obtener los negocios favoritos ");
+        }
+        //List<ItemNegocioDTO> items = new ArrayList<>();
+        //for (Negocio negocio: listaNegocios){
+         //   items.add(new ItemNegocioDTO(negocio.getCodigo(),negocio.getNombre(),negocio.getListImagenes(),negocio.getTipoNegocio(),negocio.getUbicacion()));
+        //}
+        return  listaNegocios;
     }
 
     private Cliente validarUsuarioExistente(String idUsuario) throws ResourceNotFoundException {
@@ -245,23 +283,9 @@ public class ClienteServicioImpl implements ClienteServicio {
                 .orElseThrow(() -> new ResourceNotFoundException("El usuario con ID: " + idUsuario + " no existe."));
     }
 
-    private List<ItemNegocioDTO> convertirNegociosADTOs(List<Negocio> listaNegocios) {
-        List<ItemNegocioDTO> items = new ArrayList<>();
-        for (Negocio negocio : listaNegocios) {
-            ItemNegocioDTO itemDTO = new ItemNegocioDTO(
-                    negocio.getCodigo(),
-                    negocio.getNombre(),
-                    negocio.getListImagenes(),
-                    negocio.getTipoNegocio(),
-                    negocio.getUbicacion()
-            );
-            items.add(itemDTO);
-        }
-        return items;
-    }
 
     @Override
-    public void actualizarUbicacion(String idCliente, double longitud, double latitud) throws Exception {
+    public void actualizarUbicacion(String idCliente, Double longitud, Double latitud) throws Exception {
         Optional<Cliente> optionalUsuario = validarUsuarioExiste(idCliente);
         Cliente cliente = optionalUsuario.get();
         cliente.setUbicacion(new Ubicacion(latitud,longitud));
@@ -269,31 +293,31 @@ public class ClienteServicioImpl implements ClienteServicio {
     }
 
     @Override
-    public double solicitarRuta(String idUsuario, Ubicacion ubicacionDestino, TipoMedioTransporte medioTransporte) throws ResourceNotFoundException {
-        Optional<Cliente> optionalCliente = validarUsuarioExiste(idUsuario);
+    public double solicitarRuta(String idCliente, Ubicacion ubicacionDestino, TipoMedioTransporte medioTransporte) throws ResourceNotFoundException {
+        Optional<Cliente> optionalCliente = validarUsuarioExiste(idCliente);
         Cliente cliente = optionalCliente.get();
-        double distancia = calcularDistancia(cliente.getUbicacion().getLatitud(),
+        Double distancia = calcularDistancia(cliente.getUbicacion().getLatitud(),
                 cliente.getUbicacion().getLongitud(),ubicacionDestino.getLatitud(),
                 ubicacionDestino.getLongitud());
         return distancia;
     }
 
-    public static double calcularDistancia(double latitudUsuario, double longitudUsuario, double latitudNegocio, double longitudNegocio) {
-        final double RADIO_TIERRA = 6371; // Radio de la Tierra en kilómetros
+    public static Double calcularDistancia(Double latitudUsuario, Double longitudUsuario, Double latitud, Double longitud) {
+        final int RADIO_TIERRA = 6371; // Radio de la Tierra en kilómetros
         // Convertir las coordenadas de grados a radianes
-        double latitudUsuarioRad = Math.toRadians(latitudUsuario);
-        double longitudUsuarioRad = Math.toRadians(longitudUsuario);
-        double latitudNegocioRad = Math.toRadians(latitudNegocio);
-        double longitudNegocioRad = Math.toRadians(longitudNegocio);
+        Double latitudUsuarioRad = Math.toRadians(latitudUsuario);
+        Double longitudUsuarioRad = Math.toRadians(longitudUsuario);
+        Double latitudNegocioRad = Math.toRadians(latitud);
+        Double longitudNegocioRad = Math.toRadians(longitud);
         // Calcular las diferencias de latitud y longitud
-        double diferenciaLatitud = latitudNegocioRad - latitudUsuarioRad;
-        double diferenciaLongitud = longitudNegocioRad - longitudUsuarioRad;
+        Double diferenciaLatitud = latitudNegocioRad - latitudUsuarioRad;
+        Double diferenciaLongitud = longitudNegocioRad - longitudUsuarioRad;
         // Calcular la distancia utilizando la fórmula de la distancia haversine
-        double a = Math.pow(Math.sin(diferenciaLatitud / 2), 2) +
+        Double a = Math.pow(Math.sin(diferenciaLatitud / 2), 2) +
                 Math.cos(latitudUsuarioRad) * Math.cos(latitudNegocioRad) *
                         Math.pow(Math.sin(diferenciaLongitud / 2), 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distancia = RADIO_TIERRA * c;
+        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        Double distancia = RADIO_TIERRA * c;
         return distancia;
     }
 

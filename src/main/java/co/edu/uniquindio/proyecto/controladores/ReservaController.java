@@ -24,8 +24,8 @@ public class ReservaController {
     private final ClienteServicio clienteServicio;
 
     @PostMapping("/registrar-reserva")
-    public ResponseEntity<MensajeDTO<String>> crearReserva(@Valid @RequestBody RegistroReservaDTO registroReservaDTO, String idCliente, String idNegocio) throws Exception{
-        clienteServicio.crearReserva(registroReservaDTO, idCliente, idNegocio);
+    public ResponseEntity<MensajeDTO<String>> crearReserva(@Valid @RequestBody RegistroReservaDTO registroReservaDTO) throws Exception{
+        clienteServicio.crearReserva(registroReservaDTO);
         return ResponseEntity.ok().body(new MensajeDTO<>(false,"La reserva se creo correctamente"));
     }
 
@@ -36,8 +36,8 @@ public class ReservaController {
     }
 
     @PutMapping("/editar-reserva/{idReserva}")
-    public ResponseEntity<MensajeDTO<String>> actualizarReserva(@Valid @RequestBody ActualizarReservaDTO actualizarReservaDTO, String idReserva) throws Exception{
-        reservaServicio.actualizarReserva(actualizarReservaDTO, idReserva);
+    public ResponseEntity<MensajeDTO<String>> actualizarReserva(@Valid @RequestBody ActualizarReservaDTO actualizarReservaDTO) throws Exception{
+        reservaServicio.actualizarReserva(actualizarReservaDTO);
         return ResponseEntity.ok().body(new MensajeDTO<>(false,"Reserva actualizado con éxito."));
     }
 
@@ -46,7 +46,7 @@ public class ReservaController {
         return ResponseEntity.ok().body(new MensajeDTO<>(false,reservaServicio.listarReservasXCliente(idCliente)));
     }
 
-    @GetMapping("/listar-reservas-negocio/{idCliente}")
+    @GetMapping("/listar-reservas-negocio/{idNegocio}")
     public ResponseEntity<MensajeDTO<List<ItemReservaDTO>>> listarReservasXNegocio(@PathVariable String idNegocio) throws Exception{
         return ResponseEntity.ok().body(new MensajeDTO<>(false,reservaServicio.listarReservasXNegocio(idNegocio)));
     }

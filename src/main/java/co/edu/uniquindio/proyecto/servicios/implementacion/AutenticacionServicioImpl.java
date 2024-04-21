@@ -47,19 +47,19 @@ public class AutenticacionServicioImpl implements AutenticacionServicio {
 
     @Override
     public TokenDTO iniciarSesionModerador(LoginDTO loginDTO) throws Exception {
-        Optional<Cuenta> usuarioOptional = moderadorRepo.findByEmail(loginDTO.email());
+        Optional<Moderador> usuarioOptional = moderadorRepo.findByEmail(loginDTO.email());
         if (usuarioOptional.isEmpty()) {
             throw new Exception("El correo no se encuentra registrado");
         }
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        Cuenta cuenta = usuarioOptional.get();
-        if( !passwordEncoder.matches(loginDTO.contrasenia(), cuenta.getPassword()) ) {
+        Moderador moderador = usuarioOptional.get();
+        if( passwordEncoder.matches(loginDTO.contrasenia(), moderador.getPassword()) ) {
             throw new Exception("La contraseña es incorrecta");
         }
         Map<String, Object> map = new HashMap<>();
         map.put("rol", "MODERADOR");
-        map.put("nombre", cuenta.getNombre());
-        map.put("id", cuenta);
-        return new TokenDTO( jwtUtils.generarToken(cuenta.getEmail(), map) );
+        map.put("nombre", moderador.getNombre());
+        map.put("id", moderador);
+        return new TokenDTO( jwtUtils.generarToken(moderador.getEmail(), map) );
     }
 }

@@ -27,4 +27,5 @@ public class EmailServicioTest {
         emailServicio.enviarCorreo(emailDTO);
         Assertions.assertNotNull("asunto",emailDTO.asunto());
     }
+
 }

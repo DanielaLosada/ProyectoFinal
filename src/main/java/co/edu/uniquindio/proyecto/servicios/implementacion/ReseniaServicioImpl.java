@@ -31,7 +31,7 @@ public class ReseniaServicioImpl implements ReseniaServicio {
         resenia.setCodigoNegocio(registroReseniaDTO.idNegocio());
         resenia.setFecha(LocalDateTime.now());
         Resenia reseniaGuardada= reseniaRepo.save(resenia);
-
+        System.out.println("Reseña creada correctamente");
         return reseniaGuardada.getCodigo();
     }
 
@@ -48,6 +48,7 @@ public class ReseniaServicioImpl implements ReseniaServicio {
 //        }
         resenia.setRespuesta(responderReseniaDTO.respuesta());
         reseniaRepo.save(resenia);
+        System.out.println("Se ha respondido a la reseña");
     }
 
     @Override

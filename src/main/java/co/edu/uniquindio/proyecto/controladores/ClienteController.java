@@ -3,11 +3,13 @@ package co.edu.uniquindio.proyecto.controladores;
 import co.edu.uniquindio.proyecto.dto.CambioPasswordDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.ActualizarClienteDTO;
 import co.edu.uniquindio.proyecto.dto.ClienteDTO.DetalleClienteDTO;
+import co.edu.uniquindio.proyecto.dto.ClienteDTO.RegistroClienteDTO;
 import co.edu.uniquindio.proyecto.dto.MensajeDTO;
 import co.edu.uniquindio.proyecto.dto.NegocioDTO.ItemNegocioDTO;
 import co.edu.uniquindio.proyecto.dto.ReseniaDTO.RegistroReseniaDTO;
 import co.edu.uniquindio.proyecto.dto.ReseniaDTO.ResponderReseniaDTO;
 import co.edu.uniquindio.proyecto.exceptions.ResourceNotFoundException;
+import co.edu.uniquindio.proyecto.modelo.Negocio;
 import co.edu.uniquindio.proyecto.modelo.TipoMedioTransporte;
 import co.edu.uniquindio.proyecto.modelo.Ubicacion;
 import co.edu.uniquindio.proyecto.servicios.interfaces.ClienteServicio;
@@ -29,16 +31,23 @@ public class ClienteController {
     private final ReseniaServicio reseniaServicio;
     private final CuentaServicio cuentaServicio;
 
+
     @PutMapping("/editar-cliente")
     public ResponseEntity<MensajeDTO<String>> actualizarUsuario(@Valid @RequestBody ActualizarClienteDTO actualizarClienteDTO) throws Exception{
         clienteServicio.actualizarCliente(actualizarClienteDTO);
-        return ResponseEntity.ok().body(new MensajeDTO<>(false,"Usuario actualizado correctamente."));
+        return ResponseEntity.ok().body(new MensajeDTO<>(false,"Cliente actualizado correctamente."));
+    }
+
+    @PostMapping("/registrar-cliente")
+    public ResponseEntity<MensajeDTO<String>> registrarUsuario(@Valid @RequestBody RegistroClienteDTO registroClienteDTO) throws Exception{
+        clienteServicio.registrarCliente(registroClienteDTO);
+        return ResponseEntity.ok().body( new MensajeDTO<>(false, "Cliente registrado correctamente"));
     }
 
     @DeleteMapping("/eliminar-cliente/{idCliente}")
-    public ResponseEntity<MensajeDTO<String>> eliminarCliente(@PathVariable String idUsuario) throws Exception { //Que retorne el id de la cuenta eliminada
-        clienteServicio.eliminarCliente(idUsuario);
-        return ResponseEntity.ok().body(new MensajeDTO<>(false,"Cliente eliminado correctamente "+idUsuario));
+    public ResponseEntity<MensajeDTO<String>> eliminarCliente(@PathVariable String idCliente) throws Exception { //Que retorne el id de la cuenta eliminada
+        clienteServicio.eliminarCliente(idCliente);
+        return ResponseEntity.ok().body(new MensajeDTO<>(false,"Cliente eliminado correctamente "+idCliente));
     }
 
     @GetMapping("/obtener-cliente/{idCuenta}")
@@ -46,6 +55,12 @@ public class ClienteController {
 
         return ResponseEntity.ok().body( new MensajeDTO<>(false,
                 clienteServicio.obtenerCliente(idCuenta) ) );
+    }
+
+    @PutMapping("/recuperar-contrasenia-cliente/{idCliente}")
+    public ResponseEntity<MensajeDTO<CambioPasswordDTO>> recuperarContrasenia(@PathVariable String idCliente) throws Exception {
+
+        return ResponseEntity.ok().body(new MensajeDTO<>(false,clienteServicio.recuperarContrasenia(idCliente)));
     }
 
     @PutMapping("/agregar-negocio-favoritos/{idNegocio}/{idCliente}")
@@ -61,19 +76,19 @@ public class ClienteController {
     }
 
     @GetMapping("/listar-negocios-favoritos/{idCliente}")
-    public ResponseEntity<MensajeDTO<List<ItemNegocioDTO>>> listarNegociosFavoritos(@PathVariable String idCliente) throws Exception{
+    public ResponseEntity<MensajeDTO<List<Negocio>>> listarNegociosFavoritos(@PathVariable String idCliente) throws Exception{
         return ResponseEntity.ok().body(new MensajeDTO<>(false,clienteServicio.listarNegociosFavoritos(idCliente)));
     }
 
-    @GetMapping("/solicitar-Ruta/{idCliente}")
-    public ResponseEntity<MensajeDTO<String>> solicitarRuta(@PathVariable String idCliente,@Valid @RequestBody Ubicacion ubicacionDestino,@Valid @RequestBody TipoMedioTransporte medioTransporte ) throws ResourceNotFoundException {
+    @GetMapping("/solicitar-Ruta/")
+    public ResponseEntity<MensajeDTO<String>> solicitarRuta(@Valid @RequestBody String idCliente, Ubicacion ubicacionDestino, TipoMedioTransporte medioTransporte ) throws ResourceNotFoundException {
         clienteServicio.solicitarRuta(idCliente,ubicacionDestino, medioTransporte);
-        return ResponseEntity.ok().body(new MensajeDTO<>(false,"Ruta encontrada correctamente"));
+        return ResponseEntity.ok().body(new MensajeDTO<>(true,"Ruta encontrada correctamente"));
     }
 
     @PutMapping("/actualizar-ubicacion/{idCliente}")
-    public ResponseEntity<MensajeDTO<String>> actualizarUbicacion(@PathVariable String idCliente,double longitud, double latitud) throws Exception{
-        clienteServicio.actualizarUbicacion(idCliente,longitud,latitud);
+    public ResponseEntity<MensajeDTO<String>> actualizarUbicacion(@PathVariable String idCliente, @RequestBody Ubicacion ubicacion) throws Exception{
+        clienteServicio.actualizarUbicacion(idCliente,ubicacion.getLongitud(), ubicacion.getLatitud());
         return ResponseEntity.ok().body(new MensajeDTO<>(false,"Ubicación actualizada correctamente."));
     }
 
@@ -92,6 +107,9 @@ public class ClienteController {
     public ResponseEntity<MensajeDTO<List<ItemNegocioDTO>>> recomendarLugares(@PathVariable String idCliente) throws Exception {
         return ResponseEntity.ok().body(new MensajeDTO<>(false, clienteServicio.recomendarLugares(idCliente)));
     }
+
+
+
 
 
 }

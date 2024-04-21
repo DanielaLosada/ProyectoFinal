@@ -46,6 +46,7 @@ public class NegocioServicioImpl implements NegocioServicio {
 
         //Se guarda en la base de datos y obtenemos el objeto registrado
         Negocio negocioGuardado = negocioRepo.save(negocio);
+        System.out.println("Negocio creado correctamente");
 
         //Retornamos el id (código) del negocio registrado en la BD
         return negocioGuardado.getCodigo();
@@ -76,6 +77,7 @@ public class NegocioServicioImpl implements NegocioServicio {
         negocio.setListImagenes(actualizarNegocioDTO.listImagenes());
         negocio.setListTelefonos(actualizarNegocioDTO.listTelefonos());
         negocioRepo.save(negocio);
+        System.out.println("Negocio actualizado correctamente");
     }
 
     private Optional<Negocio> validarNegocioExiste(String idNegocio) throws ResourceNotFoundException {
@@ -83,6 +85,7 @@ public class NegocioServicioImpl implements NegocioServicio {
         if(optionalNegocio.isEmpty()){
             throw new ResourceNotFoundException("El negocio no se pudo encontrar");
         }
+
         return optionalNegocio;
     }
 
@@ -96,6 +99,7 @@ public class NegocioServicioImpl implements NegocioServicio {
         }
         negocio.setEstadoRegistro(EstadoRegistro.INACTIVO);
         negocioRepo.save(negocio);
+        System.out.println("El negocio se elimino correctamente");
     }
 
     @Override

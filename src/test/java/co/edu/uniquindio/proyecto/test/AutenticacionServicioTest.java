@@ -17,7 +17,7 @@ public class AutenticacionServicioTest {
     @Test
     public void iniciarSesionClienteTest() throws Exception{
         LoginDTO loginDTO = new LoginDTO(
-                "paolo23rjd@gmail.com",
+                "pedrolopez@gmail.com",
                 "Paolooo@0"
         );
         TokenDTO codigo = autenticacionServicio.iniciarSesionCliente(loginDTO);
@@ -28,7 +28,7 @@ public class AutenticacionServicioTest {
     public void iniciarSesionModeradorTest() throws Exception{
         LoginDTO loginDTO = new LoginDTO(
                 "angieruiz564@gmail.com",
-                "lucas2004"
+                "Lucas2004@"
         );
         TokenDTO codigo = autenticacionServicio.iniciarSesionModerador(loginDTO);
         Assertions.assertNotNull(codigo);

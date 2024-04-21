@@ -16,6 +16,9 @@ public class Horario {
     private LocalTime horaFin;
     private String dia;
 
-    public Horario(LocalDateTime now, LocalDateTime now1, String martes) {
+    public Horario(LocalTime horaInicio, LocalTime horaFin, String dia) {
+        this.horaInicio=horaInicio;
+        this.horaFin=horaFin;
+        this.dia=dia;
     }
 }

@@ -16,7 +16,7 @@ public class ModeradorServicioTest {
 
     @Test
     public void obtenerDatosTest() throws Exception{
-        Assertions.assertNotNull(moderadorServicio.obtenerInfoModerador("6622e7b7f206fe603f114bdf"));
+        Assertions.assertNotNull(moderadorServicio.obtenerInfoModerador("6624066981b4081267f3ff06"));
     }
 
     @Test

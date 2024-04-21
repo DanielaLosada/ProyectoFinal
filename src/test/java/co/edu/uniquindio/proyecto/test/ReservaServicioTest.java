@@ -32,17 +32,18 @@ public class ReservaServicioTest {
                 LocalTime.now(),
                 150.000
         );
-        String codigo = clienteServicio.crearReserva(registroReservaDTO,"66229ef257c6c37d8b970b4e", "6622a1cb66aafa3801ec15f0");
+        String codigo = clienteServicio.crearReserva(registroReservaDTO);
         Assertions.assertNotNull(codigo);
     }
 
     @Test
     public void actualizarTest() throws Exception {
         ActualizarReservaDTO actualizarReservaDTO = new ActualizarReservaDTO(
+                "6622d12ae68d010afbded894",
                 LocalDateTime.now(),
                 LocalTime.now()
         );
-        reservaServicio.actualizarReserva(actualizarReservaDTO, "6622d12ae68d010afbded894");
+        reservaServicio.actualizarReserva(actualizarReservaDTO);
     }
 
     @Test

@@ -12,11 +12,13 @@ import java.util.List;
 
 public class Ubicacion {
 
-    private double  latitud;
-    private double  longitud;
+    private Double  latitud;
+    private Double  longitud;
     private List<Ruta> listRutas;
 
 
-    public Ubicacion(double latitud, double longitud) {
+    public Ubicacion(Double latitud, Double longitud) {
+        this.latitud=latitud;
+        this.longitud=longitud;
     }
 }

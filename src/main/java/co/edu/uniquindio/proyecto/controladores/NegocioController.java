@@ -55,7 +55,7 @@ public class NegocioController {
     }
 
     @GetMapping("/buscar-negocios-tipo/{tipoNegocio}")
-    public ResponseEntity<MensajeDTO<List<ItemNegocioDTO>>> buscarNegociosPorTipo(@Valid @RequestBody TipoNegocio tipoNegocio) throws Exception{
+    public ResponseEntity<MensajeDTO<List<ItemNegocioDTO>>> buscarNegociosPorTipo(@PathVariable TipoNegocio tipoNegocio) throws Exception{
         return ResponseEntity.ok().body(new MensajeDTO<>(false,negocioServicio.filtarNegocioTipo(tipoNegocio)));
     }
 

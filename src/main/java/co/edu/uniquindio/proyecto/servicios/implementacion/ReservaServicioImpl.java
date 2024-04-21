@@ -30,6 +30,7 @@ public class ReservaServicioImpl implements ReservaServicio {
         Optional<Reserva> optionalReserva = validarReservaExiste(idReserva);
         if (optionalReserva.isPresent()) {
             reservaRepo.deleteById(idReserva);
+            System.out.println("Reserva eliminada correctamente");
         } else {
             throw new Exception("La reserva con el ID " + idReserva + " no existe");
         }
@@ -40,27 +41,24 @@ public class ReservaServicioImpl implements ReservaServicio {
         if(optionalReserva.isEmpty()){
             throw new ResourceNotFoundException("Reserva no encontrada.");
         }
+        System.out.println("Reserva encontrada correctamente");
         return optionalReserva;
     }
 
     @Override
-    public void actualizarReserva(ActualizarReservaDTO actualizarReservaDTO, String idReserva) throws Exception {
-        Optional<Reserva> optionalReserva = validarReservaExiste(idReserva);
-        if (optionalReserva.isPresent()) {
-            Reserva reserva = optionalReserva.get();
-
-            reserva.setHora(actualizarReservaDTO.hora());
-            if (!esFechaValida(actualizarReservaDTO.fecha())){
-                throw new Exception("La hora de la reserva no es válido. Debe estar dentro del horario permitido.");
-            }
-            reserva.setFecha(actualizarReservaDTO.fecha());
-
-            // Guardar la reserva actualizada en el repositorio
-            reservaRepo.save(reserva);
-        } else {
-            throw new Exception("La reserva a actualizar no existe.");
+    public void actualizarReserva(ActualizarReservaDTO actualizarReservaDTO) throws Exception {
+        Optional<Reserva> optionalReserva = validarReservaExiste(actualizarReservaDTO.idReserva());
+        Reserva reserva = optionalReserva.get();
+        reserva.setHora(actualizarReservaDTO.hora());
+        if (!esFechaValida(actualizarReservaDTO.fecha())){
+            throw new Exception("La hora de la reserva no es válido. Debe estar dentro del horario permitido.");
         }
-    }
+        reserva.setFecha(actualizarReservaDTO.fecha());
+        // Guardar la reserva actualizada en el repositorio
+        reservaRepo.save(reserva);
+        System.out.println("Reserva actualizada correctamente");
+        }
+
 
     public boolean esFechaValida(LocalDateTime fecha) {
         LocalDateTime fechaActual = LocalDateTime.now();

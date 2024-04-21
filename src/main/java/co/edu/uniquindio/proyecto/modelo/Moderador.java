@@ -9,6 +9,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Document("Moderadores")
 public class Moderador extends Cuenta implements Serializable {

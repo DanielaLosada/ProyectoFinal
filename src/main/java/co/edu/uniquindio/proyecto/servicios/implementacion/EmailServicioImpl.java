@@ -15,22 +15,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailServicioImpl implements EmailService {
 
-    private final JavaMailSender javaMailSender;
-
-    public EmailServicioImpl(JavaMailSender javaMailSender) {
-        this.javaMailSender = javaMailSender;
-    }
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     @Override
-    public void enviarCorreo(EmailDTO emailDTO) throws MessagingException {
+    public void enviarCorreo (EmailDTO emailDTO) throws MessagingException {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
         helper.setSubject(emailDTO.asunto());
         helper.setText(emailDTO.cuerpo(), true);
         helper.setTo(emailDTO.destinatario());
-        helper.setFrom("no_reply@dominio.com");
+        helper.setFrom("angiex.ruizr@uqvirtual.edu.co");
 
         javaMailSender.send(message);
+        System.out.println("El correo se envio");
     }
+
 }

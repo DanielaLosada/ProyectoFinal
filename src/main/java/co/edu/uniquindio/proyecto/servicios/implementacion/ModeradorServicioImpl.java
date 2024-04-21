@@ -29,12 +29,11 @@ public class ModeradorServicioImpl implements ModeradorServicio {
 
     @Override
     public ItemModeradorDTO obtenerInfoModerador(String idModerador) throws Exception {
-        Optional<Moderador> optionalModerador = moderadorRepo.findByIdModerador(idModerador);
+        Optional<Moderador> optionalModerador = moderadorRepo.findById(idModerador);
         if (optionalModerador.isEmpty()){
             throw new Exception("Error al momento de obtener el moderador "+idModerador);
         }
         Moderador moderador= optionalModerador.get();
-
         return new ItemModeradorDTO(moderador.getIdModerador() ,moderador.getNombre());
     }
 
@@ -55,6 +54,7 @@ public class ModeradorServicioImpl implements ModeradorServicio {
                 EstadoNegocio.APROBADO
         ) );
         negocioRepo.save(negocio);
+        System.out.println("Se ha aprobado el negocio");
     }
 
     @Override
@@ -74,6 +74,7 @@ public class ModeradorServicioImpl implements ModeradorServicio {
                 EstadoNegocio.APROBADO
         ) );
         negocioRepo.save(negocio);
+        System.out.println("Se ha rechazado el negocio");
     }
 
     private Optional<Negocio> validarNegocioExiste(String idNegocio) throws ResourceNotFoundException {

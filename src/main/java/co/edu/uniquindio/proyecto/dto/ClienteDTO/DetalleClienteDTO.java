@@ -2,6 +2,7 @@ package co.edu.uniquindio.proyecto.dto.ClienteDTO;
 
 import co.edu.uniquindio.proyecto.modelo.Ubicacion;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record DetalleClienteDTO(
 
@@ -11,7 +12,7 @@ public record DetalleClienteDTO(
         @NotBlank String nickname,
         @NotBlank String email,
         @NotBlank String ciudadResidencia,
-        @NotBlank Ubicacion ubicacion
+        @NotNull Ubicacion ubicacion
 
 ) {
 }

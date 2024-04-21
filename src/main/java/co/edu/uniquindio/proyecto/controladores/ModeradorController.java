@@ -17,7 +17,7 @@ public class ModeradorController {
     private final ModeradorServicio moderadorServicio;
 
     @GetMapping("/obtener-datos-moderador/{idModerador}")
-    public ResponseEntity<MensajeDTO<ItemModeradorDTO>> obtenerDatosModerador(String idModerador) throws Exception{
+    public ResponseEntity<MensajeDTO<ItemModeradorDTO>> obtenerDatosModerador(@PathVariable String idModerador) throws Exception{
         return ResponseEntity.ok().body(new MensajeDTO<>(false,moderadorServicio.obtenerInfoModerador(idModerador)));
     }
 

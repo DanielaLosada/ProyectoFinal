@@ -17,7 +17,7 @@ import java.util.List;
 public class NegocioServicioTest {
     @Autowired
     private NegocioServicio negocioServicio;
-    Ubicacion ubicacion = new Ubicacion(246,246);
+    Ubicacion ubicacion = new Ubicacion(246.0,246.0);
 
     @Test
     public void crearNegocioTest() throws Exception{

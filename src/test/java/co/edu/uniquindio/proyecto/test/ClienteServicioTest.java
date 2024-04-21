@@ -20,18 +20,18 @@ public class ClienteServicioTest {
 
     @Autowired
     private ClienteServicio clienteServicio;
-    Ubicacion ubicacion = new Ubicacion(246,2456);
+    Ubicacion ubicacion = new Ubicacion(246.0,2456.0);
 
     @Test
     public void registrarTest() throws Exception {
         //Se crea un objeto de tipo RegistroClienteDTO
         RegistroClienteDTO registroClienteDTO = new RegistroClienteDTO(
-                "Paolo",
-                "ndfdjjfkjdfdslds",
-                "paolo_23",
-                "paolo23rjd@gmail.com",
-                "Paolooo@0",
-                "Bucaramanga"
+                "Samuel",
+                "jpg",
+                "samuel123",
+                "samuellopez@gmail.com",
+                "Miercoles1@23",
+                "Ibague"
         );
         //Se registra el cliente
         String codigo = clienteServicio.registrarCliente(registroClienteDTO);
@@ -84,6 +84,14 @@ public class ClienteServicioTest {
         });
     }
 
+
+    @Test
+    public void recuperarContraseniaTest() throws Exception{
+
+        Assertions.assertNotNull(clienteServicio.recuperarContrasenia("6623f76a5defc33af59528ca"));
+
+    }
+
     @Test
     public void listarNegociosFav() throws Exception{
         Assertions.assertNotNull(clienteServicio.listarNegociosFavoritos("66229ef257c6c37d8b970b4e"));
@@ -91,7 +99,7 @@ public class ClienteServicioTest {
 
     @Test
     public void actualizarUbicacionTest() throws Exception{
-        clienteServicio.actualizarUbicacion("66229a0f7417a33eb86739e9",300,350);
+        clienteServicio.actualizarUbicacion("66229ef257c6c37d8b970b4e",300.0,350.0);
     }
 
     @Test
@@ -99,32 +107,32 @@ public class ClienteServicioTest {
         Ubicacion ubicacionDestino = new Ubicacion(DESTINO_LATITUD, DESTINO_LONGITUD);
         Ubicacion ubicacionUsuario = new Ubicacion(USUARIO_LATITUD, USUARIO_LONGITUD);
 
-        double distancia = clienteServicio.solicitarRuta("66229a0f7417a33eb86739e9", ubicacionDestino, TipoMedioTransporte.CARRO);
+        Double distancia = clienteServicio.solicitarRuta("66229a0f7417a33eb86739e9", ubicacionDestino, TipoMedioTransporte.CARRO);
 
-        double distanciaEsperada = calcularDistancia(ubicacionUsuario.getLatitud(), ubicacionUsuario.getLongitud(), ubicacionDestino.getLatitud(), ubicacionDestino.getLongitud());
+        Double distanciaEsperada = calcularDistancia(ubicacionUsuario.getLatitud(), ubicacionUsuario.getLongitud(), ubicacionDestino.getLatitud(), ubicacionDestino.getLongitud());
         Assertions.assertEquals(distanciaEsperada, distancia);
     }
 
-    private double calcularDistancia(double latitudOrigen, double longitudOrigen, double latitudDestino, double longitudDestino) {
-        final double RADIO_TIERRA = 6371; // Radio de la Tierra en kilómetros
-        double latitudUsuarioRad = Math.toRadians(latitudOrigen);
-        double longitudUsuarioRad = Math.toRadians(longitudOrigen);
-        double latitudNegocioRad = Math.toRadians(latitudDestino);
-        double longitudNegocioRad = Math.toRadians(longitudDestino);
-        double diferenciaLatitud = latitudNegocioRad - latitudUsuarioRad;
-        double diferenciaLongitud = longitudNegocioRad - longitudUsuarioRad;
-        double a = Math.pow(Math.sin(diferenciaLatitud / 2), 2) +
+    private Double calcularDistancia(Double latitudOrigen, Double longitudOrigen, Double latitudDestino, Double longitudDestino) {
+        final int RADIO_TIERRA = 6371; // Radio de la Tierra en kilómetros
+        Double latitudUsuarioRad = Math.toRadians(latitudOrigen);
+        Double longitudUsuarioRad = Math.toRadians(longitudOrigen);
+        Double latitudNegocioRad = Math.toRadians(latitudDestino);
+        Double longitudNegocioRad = Math.toRadians(longitudDestino);
+        Double diferenciaLatitud = latitudNegocioRad - latitudUsuarioRad;
+        Double diferenciaLongitud = longitudNegocioRad - longitudUsuarioRad;
+        Double a = Math.pow(Math.sin(diferenciaLatitud / 2), 2) +
                 Math.cos(latitudUsuarioRad) * Math.cos(latitudNegocioRad) *
                         Math.pow(Math.sin(diferenciaLongitud / 2), 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distancia = RADIO_TIERRA * c;
+        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        Double distancia = RADIO_TIERRA * c;
         return distancia;
     }
 
-    private static final double DESTINO_LATITUD = 123.456;
-    private static final double DESTINO_LONGITUD = 789.012;
-    private static final double USUARIO_LATITUD = 456.789;
-    private static final double USUARIO_LONGITUD = 987.654;
+    private static final Double DESTINO_LATITUD = 123.456;
+    private static final Double DESTINO_LONGITUD = 789.012;
+    private static final Double USUARIO_LATITUD = 456.789;
+    private static final Double USUARIO_LONGITUD = 987.654;
 
 
 }
