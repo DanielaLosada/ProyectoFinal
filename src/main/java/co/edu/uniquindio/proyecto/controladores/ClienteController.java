@@ -9,6 +9,7 @@ import co.edu.uniquindio.proyecto.dto.NegocioDTO.ItemNegocioDTO;
 import co.edu.uniquindio.proyecto.dto.ReseniaDTO.RegistroReseniaDTO;
 import co.edu.uniquindio.proyecto.dto.ReseniaDTO.ResponderReseniaDTO;
 import co.edu.uniquindio.proyecto.exceptions.ResourceNotFoundException;
+import co.edu.uniquindio.proyecto.modelo.Cliente;
 import co.edu.uniquindio.proyecto.modelo.Negocio;
 import co.edu.uniquindio.proyecto.modelo.TipoMedioTransporte;
 import co.edu.uniquindio.proyecto.modelo.Ubicacion;
@@ -104,8 +105,8 @@ public class ClienteController {
     }
 
     @GetMapping("/get-all-users")
-    public ResponseEntity<List<Cliente>> getAllUsers(clienteServicio.geAll()) {
-        return ResponseEntity.ok();
+    public ResponseEntity<List<Cliente>> getAllUsers() {
+        return ResponseEntity.ok(clienteServicio.getAll());
     }
 
 

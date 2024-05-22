@@ -195,9 +195,10 @@ public class ClienteServicioImpl implements ClienteServicio {
      *
      * @return The database user list
      */
+    @Override
     public List<Cliente> getAll() {
         List<Cliente> clientList = new ArrayList<>();
-        for (Client client : clienteRepo.findAll()) {
+        for (Cliente client : clienteRepo.findAll()) {
                 clientList.add(client);
         }
         return clientList;

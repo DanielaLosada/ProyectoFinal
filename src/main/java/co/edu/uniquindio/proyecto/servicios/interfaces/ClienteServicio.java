@@ -9,10 +9,7 @@ import co.edu.uniquindio.proyecto.dto.NegocioDTO.ItemNegocioDTO;
 import co.edu.uniquindio.proyecto.dto.ReservaDTO.ItemReservaDTO;
 import co.edu.uniquindio.proyecto.dto.ReservaDTO.RegistroReservaDTO;
 import co.edu.uniquindio.proyecto.exceptions.ResourceNotFoundException;
-import co.edu.uniquindio.proyecto.modelo.Negocio;
-import co.edu.uniquindio.proyecto.modelo.Reserva;
-import co.edu.uniquindio.proyecto.modelo.TipoMedioTransporte;
-import co.edu.uniquindio.proyecto.modelo.Ubicacion;
+import co.edu.uniquindio.proyecto.modelo.*;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
@@ -29,6 +26,9 @@ public interface ClienteServicio {
     List<ItemClienteDTO> listarClientes();
 
     CambioPasswordDTO recuperarContrasenia(String idCliente) throws Exception;
+
+    List<Cliente> getAll();
+
     String agregarNegocioFavorito(String idCliente, String idNegocio) throws Exception;
     String eliminarNegocioFavorito(String idCliente, String idNegocio) throws ResourceNotFoundException;
     List<Negocio> listarNegociosFavoritos(String idCliente) throws Exception;
