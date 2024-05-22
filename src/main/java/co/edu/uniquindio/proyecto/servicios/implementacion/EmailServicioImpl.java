@@ -24,9 +24,37 @@ public class EmailServicioImpl implements EmailService {
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
         helper.setSubject(emailDTO.asunto());
-        helper.setText(emailDTO.cuerpo(), true);
+
+        // Construir el cuerpo del correo electrónico con HTML
+        String htmlBody = "<html>" +
+                "<head>" +
+                "<style>" +
+                "body { font-family: Arial, sans-serif; }" +
+                ".container { max-width: 600px; margin: 0 auto; padding: 20px; }" +
+                ".header { background-color: #007bff; color: #fff; padding: 20px; text-align: center; }" +
+                ".content { padding: 20px; }" +
+                ".footer { background-color: #f8f9fa; color: #000; padding: 20px; text-align: center; }" +
+                ".button { background-color: #007bff; color: #fff; padding: 10px 20px; text-decoration: none; }" +
+                "</style>" +
+                "</head>" +
+                "<body>" +
+                "<div class='container'>" +
+                "<div class='header'>" +
+                "<h1>¡Hola!</h1>" +
+                "</div>" +
+                "<div class='content'>" +
+                "<p> "+ emailDTO.cuerpo() + "</p>" +
+                "<p>Atentamente,<br/>El equipo de UniLocal</p>" +
+                "</div>" +
+                "<div class='footer'>" +
+                "<p>Este es un correo electrónico automatizado. Por favor, no responda a este mensaje.</p>" +
+                "</div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
+        helper.setText(htmlBody, true);
         helper.setTo(emailDTO.destinatario());
-        helper.setFrom("angiex.ruizr@uqvirtual.edu.co");
+        helper.setFrom("no_reply@dominio.com");
 
         javaMailSender.send(message);
         System.out.println("El correo se envio");

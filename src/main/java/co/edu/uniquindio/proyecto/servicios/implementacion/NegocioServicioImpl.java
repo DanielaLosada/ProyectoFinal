@@ -13,7 +13,9 @@ import co.edu.uniquindio.proyecto.servicios.interfaces.NegocioServicio;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -69,16 +71,46 @@ public class NegocioServicioImpl implements NegocioServicio {
 
     @Override
     public void actualizarNegocio(ActualizarNegocioDTO actualizarNegocioDTO) throws Exception {
-        Optional<Negocio> optionalNegocio = validarNegocioExiste(actualizarNegocioDTO.id());
+        if (actualizarNegocioDTO == null) {
+            throw new IllegalArgumentException("El DTO de actualización del negocio no puede ser nulo.");
+        }
+
+        Optional<Negocio> optionalNegocio;
+        try {
+            optionalNegocio = validarNegocioExiste(actualizarNegocioDTO.id());
+        } catch (Exception e) {
+            throw new Exception("Error al validar la existencia del negocio: " + e.getMessage(), e);
+        }
+
+        if (optionalNegocio.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontró el negocio a actualizar con ID " + actualizarNegocioDTO.id());
+        }
+
         Negocio negocio = optionalNegocio.get();
+
+        if (actualizarNegocioDTO.nombre() == null || actualizarNegocioDTO.nombre().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del negocio no puede ser nulo o vacío.");
+        }
+
+        if (actualizarNegocioDTO.descripcion() == null || actualizarNegocioDTO.descripcion().isEmpty()) {
+            throw new IllegalArgumentException("La descripción del negocio no puede ser nula o vacía.");
+        }
+
         negocio.setListHorarios(actualizarNegocioDTO.horarioNegocio());
         negocio.setNombre(actualizarNegocioDTO.nombre());
         negocio.setDescripcion(actualizarNegocioDTO.descripcion());
         negocio.setListImagenes(actualizarNegocioDTO.listImagenes());
         negocio.setListTelefonos(actualizarNegocioDTO.listTelefonos());
-        negocioRepo.save(negocio);
+
+        try {
+            negocioRepo.save(negocio);
+        } catch (Exception e) {
+            throw new Exception("Error al guardar el negocio: " + e.getMessage(), e);
+        }
+
         System.out.println("Negocio actualizado correctamente");
     }
+
 
     private Optional<Negocio> validarNegocioExiste(String idNegocio) throws ResourceNotFoundException {
         Optional<Negocio> optionalNegocio = negocioRepo.findById(idNegocio);
@@ -104,17 +136,37 @@ public class NegocioServicioImpl implements NegocioServicio {
 
     @Override
     public DetalleNegocioDTO buscarNegocios(String idNegocio, String idUsuario) throws Exception {
+        // Verificar que el ID del negocio no sea nulo o vacío
+        if (idNegocio == null || idNegocio.isEmpty()) {
+            throw new IllegalArgumentException("El ID del negocio no puede ser nulo o vacío.");
+        }
+
+        // Verificar que el ID del usuario no sea nulo o vacío
+        if (idUsuario == null || idUsuario.isEmpty()) {
+            throw new IllegalArgumentException("El ID del usuario no puede ser nulo o vacío.");
+        }
+
+        // Validar si el negocio existe
         Optional<Negocio> optionalNegocio = validarNegocioExiste(idNegocio);
-        Negocio negocio = optionalNegocio.get();
+        Negocio negocio = optionalNegocio.orElseThrow(() -> new ResourceNotFoundException("El negocio con ID " + idNegocio + " no se encontró en la base de datos."));
 
-        //Una vez se valida que el negocio existe lo agregamos a las busquedas del usuario
-        //que realiza la busqueda
-        agregarRegistroBusquedas(idUsuario,negocio.getNombre());
+        // Agregar el negocio a las búsquedas del usuario
+        agregarRegistroBusquedas(idUsuario, negocio.getNombre());
 
-        return new DetalleNegocioDTO(negocio.getCodigo(),negocio.getNombre(),negocio.getDescripcion(),negocio.getListImagenes(),
-                negocio.getListTelefonos(),negocio.getUbicacion(),negocio.getCodigoCliente(),negocio.getListHorarios(),
-                negocio.getTipoNegocio(),negocio.getListHistorialRevisiones());
+        return new DetalleNegocioDTO(
+                negocio.getCodigo(),
+                negocio.getNombre(),
+                negocio.getDescripcion(),
+                negocio.getListImagenes(),
+                negocio.getListTelefonos(),
+                negocio.getUbicacion(),
+                negocio.getCodigoCliente(),
+                negocio.getListHorarios(),
+                negocio.getTipoNegocio(),
+                negocio.getListHistorialRevisiones()
+        );
     }
+
 
     private void agregarRegistroBusquedas(String idCliente, String nombre) throws Exception {
         Optional<Cliente> clienteOptional = clienteRepo.findById(idCliente);
@@ -177,15 +229,121 @@ public class NegocioServicioImpl implements NegocioServicio {
     }
 
     @Override
+    public DetalleNegocioDTO obtenerNegocio(String idNegocio) throws Exception {
+        if (idNegocio == null || idNegocio.isEmpty()) {
+            throw new IllegalArgumentException("El ID del negocio no puede ser nulo o vacío.");
+        }
+
+        Optional<Negocio> optionalNegocio;
+        try {
+            optionalNegocio = negocioRepo.findById(idNegocio);
+        } catch (Exception e) {
+            throw new Exception("Error al buscar el negocio: " + e.getMessage(), e);
+        }
+
+        if (optionalNegocio.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontró el negocio con el ID " + idNegocio);
+        }
+
+        Negocio negocio = optionalNegocio.get();
+
+        return new DetalleNegocioDTO(
+                negocio.getCodigo(),
+                negocio.getNombre(),
+                negocio.getDescripcion(),
+                negocio.getListImagenes(),
+                negocio.getListTelefonos(),
+                negocio.getUbicacion(),
+                negocio.getCodigoCliente(),
+                negocio.getListHorarios(),
+                negocio.getTipoNegocio(),
+                negocio.getListHistorialRevisiones()
+        );
+    }
+
+
+    @Override
     public List<ItemNegocioDTO> filtrarNegocioEstado(EstadoNegocio estadoNegocio) throws Exception {
-        List<Negocio> listaNegocios = negocioRepo.ListarNegocioEstado(estadoNegocio);
-        if (listaNegocios.isEmpty()){
-            throw new ResourceNotFoundException("No se pudo encontrar los negocios con estado "+estadoNegocio);
+        if (estadoNegocio == null) {
+            throw new IllegalArgumentException("El estado del negocio no puede ser nulo.");
         }
+
+        List<Negocio> listaNegocios;
+        try {
+            listaNegocios = negocioRepo.ListarNegocioEstado(estadoNegocio);
+        } catch (Exception e) {
+            throw new Exception("Error al listar negocios por estado: " + e.getMessage(), e);
+        }
+
+        if (listaNegocios.isEmpty()) {
+            throw new ResourceNotFoundException("No se pudo encontrar los negocios con estado " + estadoNegocio);
+        }
+
         List<ItemNegocioDTO> items = new ArrayList<>();
-        for (Negocio negocio: listaNegocios){
-            items.add(new ItemNegocioDTO(negocio.getCodigo(),negocio.getNombre(),negocio.getListImagenes(),negocio.getTipoNegocio(),negocio.getUbicacion()));
+        for (Negocio negocio : listaNegocios) {
+            if (negocio == null) {
+                continue; // O podrías lanzar una excepción si esto no debería ocurrir
+            }
+
+            items.add(new ItemNegocioDTO(
+                    negocio.getCodigo(),
+                    negocio.getNombre(),
+                    negocio.getListImagenes(),
+                    negocio.getTipoNegocio(),
+                    negocio.getUbicacion()
+            ));
         }
-        return  items;
+
+        return items;
+    }
+
+    @Override
+    public void cambiarEstadoNegociosRechazados() {
+        // Obtener la fecha actual
+        LocalDate fechaActual = LocalDate.now();
+
+        // Obtener la lista de negocios rechazados
+        List<Negocio> negociosRechazados = negocioRepo.ListarNegocioEstado(EstadoNegocio.RECHAZADO);
+
+        // Verificar si la lista de negocios rechazados está vacía
+        if (negociosRechazados.isEmpty()) {
+            System.out.println("No hay negocios rechazados para cambiar de estado.");
+            return;
+        }
+
+        // Iterar sobre los negocios rechazados
+        for (Negocio negocio : negociosRechazados) {
+            // Obtener el historial de revisiones del negocio
+            List<HistorialRevision> historialRevisiones = negocio.getListHistorialRevisiones();
+
+            // Verificar si el historial de revisiones está vacío
+            if (historialRevisiones.isEmpty()) {
+                System.out.println("El negocio " + negocio.getCodigo() + " no tiene historial de revisiones.");
+                continue; // Saltar a la siguiente iteración del bucle
+            }
+
+            // Encontrar la última revisión en el historial
+            Optional<HistorialRevision> ultimaRevisionOpt = historialRevisiones.stream()
+                    .reduce((primera, segunda) -> segunda);
+
+            // Verificar si se encontró la última revisión
+            if (ultimaRevisionOpt.isEmpty()) {
+                System.out.println("No se pudo encontrar la última revisión para el negocio " + negocio.getCodigo());
+                continue; // Saltar a la siguiente iteración del bucle
+            }
+
+            HistorialRevision ultimaRevision = ultimaRevisionOpt.get();
+
+            // Calcular la diferencia en días entre la fecha actual y la fecha de rechazo del negocio
+            long diasDesdeRechazo = ChronoUnit.DAYS.between(ultimaRevision.getFecha(), fechaActual);
+
+            // Si han pasado más de 5 días desde el rechazo, cambiar el estado del negocio a "inactivo"
+            if (diasDesdeRechazo > 5) {
+                negocio.setEstadoRegistro(EstadoRegistro.INACTIVO);
+                // Guardar el cambio en la base de datos
+                negocioRepo.save(negocio);
+                System.out.println("El negocio " + negocio.getCodigo() + " ha sido cambiado a estado inactivo.");
+            }
+        }
     }
 }

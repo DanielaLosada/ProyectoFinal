@@ -25,9 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Service
@@ -90,21 +88,47 @@ public class ClienteServicioImpl implements ClienteServicio {
 
     @Override
     public void actualizarCliente(ActualizarClienteDTO actualizarClienteDTO) throws Exception {
-    //Buscamos el cliente que se quiere actualizar
-        Optional<Cliente> optionalCliente = clienteRepo.findById( actualizarClienteDTO.id() );
-    //Si no se encontró el cliente, lanzamos una excepción
-        if(optionalCliente.isEmpty()){
-            throw new Exception("No se encontró el cliente a actualizar");
+        if (actualizarClienteDTO == null) {
+            throw new IllegalArgumentException("El DTO de actualización del cliente no puede ser nulo.");
         }
-    //Obtenemos el cliente que se quiere actualizar y le asignamos los nuevos valores (elnickname no se puede cambiar)
+
+        Optional<Cliente> optionalCliente;
+        try {
+            optionalCliente = clienteRepo.findById(actualizarClienteDTO.id());
+        } catch (Exception e) {
+            throw new Exception("Error al buscar el cliente: " + e.getMessage(), e);
+        }
+
+        if (optionalCliente.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontró el cliente a actualizar con ID " + actualizarClienteDTO.id());
+        }
+
         Cliente cliente = optionalCliente.get();
-        cliente.setNombre( actualizarClienteDTO.nombre() );
-        cliente.setFotoPerfil( actualizarClienteDTO.fotoPerfil() );
-        cliente.setCiudad( actualizarClienteDTO.ciudadResidencia() );
-        cliente.setEmail( actualizarClienteDTO.email() );
-    //Como el objeto cliente ya tiene un id, el save() no crea un nuevo registro sino que actualiza el que ya existe
-        clienteRepo.save(cliente);
+
+        if (actualizarClienteDTO.nombre() == null || actualizarClienteDTO.nombre().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del cliente no puede ser nulo o vacío.");
+        }
+
+        if (actualizarClienteDTO.email() == null || actualizarClienteDTO.email().isEmpty()) {
+            throw new IllegalArgumentException("El email del cliente no puede ser nulo o vacío.");
+        }
+
+        if (actualizarClienteDTO.ciudadResidencia() == null || actualizarClienteDTO.ciudadResidencia().isEmpty()) {
+            throw new IllegalArgumentException("La ciudad de residencia del cliente no puede ser nula o vacía.");
+        }
+
+        cliente.setNombre(actualizarClienteDTO.nombre());
+        cliente.setFotoPerfil(actualizarClienteDTO.fotoPerfil());
+        cliente.setCiudad(actualizarClienteDTO.ciudadResidencia());
+        cliente.setEmail(actualizarClienteDTO.email());
+
+        try {
+            clienteRepo.save(cliente);
+        } catch (Exception e) {
+            throw new Exception("Error al actualizar el cliente: " + e.getMessage(), e);
+        }
     }
+
 
     @Override
     public void eliminarCliente(String idCuenta) throws Exception {
@@ -123,18 +147,34 @@ public class ClienteServicioImpl implements ClienteServicio {
 
     @Override
     public DetalleClienteDTO obtenerCliente(String idCuenta) throws Exception {
-    //Buscamos el cliente que se quiere eliminar
-        Optional<Cliente> optionalCliente = clienteRepo.findById( idCuenta );
-    //Si no se encontró el cliente, lanzamos una excepción
-        if(optionalCliente.isEmpty()){
-            throw new Exception("No se encontró el cliente a con el id "+idCuenta);
+        if (idCuenta == null || idCuenta.isEmpty()) {
+            throw new IllegalArgumentException("El ID de la cuenta no puede ser nulo o vacío.");
         }
-    //Obtenemos el cliente
+
+        Optional<Cliente> optionalCliente;
+        try {
+            optionalCliente = clienteRepo.findById(idCuenta);
+        } catch (Exception e) {
+            throw new Exception("Error al buscar el cliente: " + e.getMessage(), e);
+        }
+
+        if (optionalCliente.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontró el cliente con el ID " + idCuenta);
+        }
+
         Cliente cliente = optionalCliente.get();
-    //Retornamos el cliente en formato DTO
-        return new DetalleClienteDTO(cliente.getCodigo(), cliente.getNombre(),
-                cliente.getFotoPerfil(), cliente.getNickName(), cliente.getEmail(), cliente.getCiudad(), cliente.getUbicacion());
+
+        return new DetalleClienteDTO(
+                cliente.getCodigo(),
+                cliente.getNombre(),
+                cliente.getFotoPerfil(),
+                cliente.getNickName(),
+                cliente.getEmail(),
+                cliente.getCiudad(),
+                cliente.getUbicacion()
+        );
     }
+
     @Override
     public List<ItemClienteDTO> listarClientes() {
     //Obtenemos todos los clientes de la base de datos
@@ -151,12 +191,23 @@ public class ClienteServicioImpl implements ClienteServicio {
 
     @Override
     public String agregarNegocioFavorito(String idCliente, String idNegocio) throws Exception {
+        // Verificar que el ID del cliente no sea nulo o vacío
+        if (idCliente == null || idCliente.isEmpty()) {
+            throw new IllegalArgumentException("El ID del cliente no puede ser nulo o vacío.");
+        }
+        // Verificar que el ID del negocio no sea nulo o vacío
+        if (idNegocio == null || idNegocio.isEmpty()) {
+            throw new IllegalArgumentException("El ID del negocio no puede ser nulo o vacío.");
+        }
+
         // Verificar que el negocio exista en la base de datos
         Negocio negocio = negocioRepo.findById(idNegocio)
                 .orElseThrow(() -> new ResourceNotFoundException("El negocio que desea agregar a la lista de favoritos no se encuentra registrado en la base de datos."));
-        // Verificar si el usuario existe
+
+        // Verificar si el cliente existe
         Cliente cliente = clienteRepo.findById(idCliente)
-                .orElseThrow(() -> new ResourceNotFoundException("El cliente no existe."));
+                .orElseThrow(() -> new ResourceNotFoundException("El cliente con ID " + idCliente + " no existe en la base de datos."));
+
         // Inicializar la lista de favoritos si es nula
         if (cliente.getNegociosFavoritos() == null) {
             cliente.setNegociosFavoritos(new ArrayList<>());
@@ -166,13 +217,15 @@ public class ClienteServicioImpl implements ClienteServicio {
             cliente.setRegistroBusquedas(new ArrayList<>());
         }
         // Agregar el negocio a la lista de favoritos
-        cliente.getNegociosFavoritos().add(obtenerNombreNegocioById(idNegocio));
+        cliente.getNegociosFavoritos().add(negocio.getCodigo());
         // Agregar el nombre del negocio a la lista de registros de búsqueda
-        cliente.getRegistroBusquedas().add(obtenerNombreNegocioById(idNegocio));
+        cliente.getRegistroBusquedas().add(negocio.getNombre());
         // Guardar los cambios en la base de datos
         clienteRepo.save(cliente);
+
         return idCliente;
     }
+
 
     public String crearReserva(RegistroReservaDTO registroReservaDTO) throws Exception {
         Reserva reserva = new Reserva();
@@ -231,21 +284,37 @@ public class ClienteServicioImpl implements ClienteServicio {
 
     @Override
     public CambioPasswordDTO recuperarContrasenia(String idCliente) throws Exception {
-        Optional<Cliente> optionalCliente = validarUsuarioExiste(idCliente);
-        String nuevaContra=generarNuevaContrasenia();
-
-        //Obtenemos el usuario que se quiere recuperar la contraseña y verifica su estado
-        Cliente cliente = optionalCliente.get();
-        if (cliente.getEstado().equals(EstadoRegistro.INACTIVO)){
-            throw new Exception("CUENTA CON ESTADO INVÁLIDO");
+        // Verificar que el ID del cliente no sea nulo o vacío
+        if (idCliente == null || idCliente.isEmpty()) {
+            throw new IllegalArgumentException("El ID del cliente no puede ser nulo o vacío.");
         }
+
+        // Validar si el cliente existe
+        Optional<Cliente> optionalCliente = validarUsuarioExiste(idCliente);
+        Cliente cliente = optionalCliente.orElseThrow(() -> new ResourceNotFoundException("El cliente con ID " + idCliente + " no se encuentra en la base de datos."));
+
+        // Verificar el estado del cliente
+        if (cliente.getEstado() == EstadoRegistro.INACTIVO) {
+            throw new Exception("La cuenta está inactiva. No se puede recuperar la contraseña.");
+        }
+
+        // Generar una nueva contraseña
+        String nuevaContrasenia = generarNuevaContrasenia();
+
+        // Codificar y establecer la nueva contraseña para el cliente
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        cliente.setPassword(passwordEncoder.encode(nuevaContra));
+        cliente.setPassword(passwordEncoder.encode(nuevaContrasenia));
         clienteRepo.save(cliente);
-        CambioPasswordDTO cambiarPasswordDTO = new CambioPasswordDTO(idCliente,nuevaContra,cliente.getEmail());
+
+        // Crear el DTO de cambio de contraseña
+        CambioPasswordDTO cambiarPasswordDTO = new CambioPasswordDTO(idCliente, nuevaContrasenia, cliente.getEmail());
+
+        // Enviar el correo de recuperación de contraseña
         enviarCorreoRecuperacion(cambiarPasswordDTO);
+
         return cambiarPasswordDTO;
     }
+
 
     private String generarNuevaContrasenia() {
        String CARACTERES_PERMITIDOS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$!%*?&";
@@ -260,23 +329,49 @@ public class ClienteServicioImpl implements ClienteServicio {
     }
 
     private void enviarCorreoRecuperacion(CambioPasswordDTO cambiarPasswordDTO) throws Exception {
+        // Verificar que el DTO de cambio de contraseña no sea nulo
+        if (cambiarPasswordDTO == null) {
+            throw new IllegalArgumentException("El DTO de cambio de contraseña no puede ser nulo.");
+        }
 
-        emailService.enviarCorreo(new EmailDTO("RECUPERACIÓN DE CONTRASEÑA", "Su nueva contraseña es: "+cambiarPasswordDTO.passwordNueva(), cambiarPasswordDTO.email()));
+        // Verificar que el correo no sea nulo o vacío
+        String email = cambiarPasswordDTO.email();
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("El correo no puede ser nulo o vacío.");
+        }
+
+        // Verificar que la nueva contraseña no sea nula o vacía
+        String nuevaContrasenia = cambiarPasswordDTO.passwordNueva();
+        if (nuevaContrasenia == null || nuevaContrasenia.isEmpty()) {
+            throw new IllegalArgumentException("La nueva contraseña no puede ser nula o vacía.");
+        }
+
+        // Enviar el correo de recuperación de contraseña
+        String mensaje = "Su nueva contraseña es: " + nuevaContrasenia;
+        emailService.enviarCorreo(new EmailDTO("RECUPERACIÓN DE CONTRASEÑA", mensaje, email));
     }
+
 
     @Override
-    public List<Negocio> listarNegociosFavoritos(String idCliente) throws Exception{
-
-        List<Negocio> listaNegocios = clienteRepo.ListarFavoritos(idCliente);
-        if (listaNegocios.isEmpty()){
-            throw new ResourceNotFoundException("Error al momento de obtener los negocios favoritos ");
+    public List<Negocio> listarNegociosFavoritos(String idCliente) throws Exception {
+        if (idCliente == null || idCliente.isEmpty()) {
+            throw new IllegalArgumentException("El ID del cliente no puede ser nulo o vacío.");
         }
-        //List<ItemNegocioDTO> items = new ArrayList<>();
-        //for (Negocio negocio: listaNegocios){
-         //   items.add(new ItemNegocioDTO(negocio.getCodigo(),negocio.getNombre(),negocio.getListImagenes(),negocio.getTipoNegocio(),negocio.getUbicacion()));
-        //}
-        return  listaNegocios;
+
+        List<Negocio> listaNegocios;
+        try {
+            listaNegocios = clienteRepo.ListarFavoritos(idCliente);
+        } catch (Exception e) {
+            throw new Exception("Error al obtener los negocios favoritos del cliente con ID " + idCliente + ": " + e.getMessage(), e);
+        }
+
+        if (listaNegocios.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontraron negocios favoritos para el cliente con ID " + idCliente);
+        }
+
+        return listaNegocios;
     }
+
 
     private Cliente validarUsuarioExistente(String idUsuario) throws ResourceNotFoundException {
         return clienteRepo.findById(idUsuario)
@@ -334,17 +429,49 @@ public class ClienteServicioImpl implements ClienteServicio {
     }
 
     private List<ItemNegocioDTO> obtenerLugaresRecomendados(List<String> listaLugares) throws ResourceNotFoundException {
-        List<Negocio> listaNegocios = new ArrayList<>();
-        for (String lugar: listaLugares) {
-            if (!listaNegocios.contains(negocioRepo.busquedaNombresSimilares(lugar).get(0))) {
-                listaNegocios.add((Negocio) negocioRepo.busquedaNombresSimilares(lugar).get(0));}
+        if (listaLugares == null || listaLugares.isEmpty()) {
+            throw new IllegalArgumentException("La lista de lugares no puede ser nula o vacía.");
         }
+
+        List<Negocio> listaNegocios = new ArrayList<>();
+        Set<String> nombresUnicos = new HashSet<>();
+
+        for (String lugar : listaLugares) {
+            if (lugar == null || lugar.isEmpty()) {
+                throw new IllegalArgumentException("El nombre del lugar no puede ser nulo o vacío.");
+            }
+
+            List<Object> negociosEncontrados;
+            try {
+                negociosEncontrados = negocioRepo.busquedaNombresSimilares(lugar);
+            } catch (Exception e) {
+                throw new ResourceNotFoundException("Error al buscar negocios con nombre similar a " + lugar + ": " + e.getMessage());
+            }
+
+            if (negociosEncontrados.isEmpty()) {
+                throw new ResourceNotFoundException("No se encontraron negocios con nombre similar a " + lugar);
+            }
+
+            Negocio primerNegocio = (Negocio) negociosEncontrados.get(0);
+            if (nombresUnicos.add(primerNegocio.getNombre())) {
+                listaNegocios.add(primerNegocio);
+            }
+        }
+
         List<ItemNegocioDTO> itemNegocioDTOList = new ArrayList<>();
         for (Negocio negocio : listaNegocios) {
-            itemNegocioDTOList.add(new ItemNegocioDTO(negocio.getCodigo(), negocio.getNombre(), negocio.getListImagenes(), negocio.getTipoNegocio(), negocio.getUbicacion()));
+            itemNegocioDTOList.add(new ItemNegocioDTO(
+                    negocio.getCodigo(),
+                    negocio.getNombre(),
+                    negocio.getListImagenes(),
+                    negocio.getTipoNegocio(),
+                    negocio.getUbicacion()
+            ));
         }
+
         return itemNegocioDTOList;
     }
+
 
     @Override
     public List<ItemReservaDTO> listarReservasXCliente(String idCliente) throws Exception {

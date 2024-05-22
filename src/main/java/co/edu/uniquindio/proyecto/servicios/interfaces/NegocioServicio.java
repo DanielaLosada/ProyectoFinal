@@ -22,7 +22,12 @@ public interface NegocioServicio {
     //BUSQUEDAS--------------------------------------------
     DetalleNegocioDTO filtarNegocioNombre(String nombreNegocio) throws Exception;
     List<ItemNegocioDTO> filtarNegocioTipo(TipoNegocio tipoNegocio) throws Exception;
+
+    DetalleNegocioDTO obtenerNegocio(String idNegocio) throws Exception;
+
     List<ItemNegocioDTO> filtrarNegocioEstado (EstadoNegocio estadoNegocio) throws Exception;
+
+    void cambiarEstadoNegociosRechazados();
 
 
     //-------------------------------------------------------
