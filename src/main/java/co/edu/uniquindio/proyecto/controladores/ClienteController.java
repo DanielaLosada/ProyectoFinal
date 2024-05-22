@@ -30,7 +30,7 @@ public class ClienteController {
     private final ClienteServicio clienteServicio;
     private final ReseniaServicio reseniaServicio;
     private final CuentaServicio cuentaServicio;
-
+    
 
     @PutMapping("/editar-cliente")
     public ResponseEntity<MensajeDTO<String>> actualizarUsuario(@Valid @RequestBody ActualizarClienteDTO actualizarClienteDTO) throws Exception{
@@ -106,6 +106,11 @@ public class ClienteController {
     @GetMapping("/recomendar-lugares/{idCliente}")
     public ResponseEntity<MensajeDTO<List<ItemNegocioDTO>>> recomendarLugares(@PathVariable String idCliente) throws Exception {
         return ResponseEntity.ok().body(new MensajeDTO<>(false, clienteServicio.recomendarLugares(idCliente)));
+    }
+
+    @GetMapping("/get-all-users")
+    public ResponseEntity<List<Cliente>> getAllUsers(clienteServicio.geAll()) {
+        return ResponseEntity.ok();
     }
 
 

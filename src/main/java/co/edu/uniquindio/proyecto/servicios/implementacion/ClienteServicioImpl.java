@@ -189,6 +189,20 @@ public class ClienteServicioImpl implements ClienteServicio {
         return items;
     }
 
+    // ----------------------------------------------------
+    /**
+     * Method that obtains all users from the database
+     *
+     * @return The database user list
+     */
+    public List<Cliente> getAll() {
+        List<Cliente> clientList = new ArrayList<>();
+        for (Client client : clienteRepo.findAll()) {
+                clientList.add(client);
+        }
+        return clientList;
+    }
+
     @Override
     public String agregarNegocioFavorito(String idCliente, String idNegocio) throws Exception {
         // Verificar que el ID del cliente no sea nulo o vacío
