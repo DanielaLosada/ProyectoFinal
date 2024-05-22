@@ -1,5 +1,6 @@
 package co.edu.uniquindio.proyecto.controladores;
 
+import co.edu.uniquindio.proyecto.dto.ClienteDTO.RegistroClienteDTO;
 import co.edu.uniquindio.proyecto.dto.LoginDTO;
 import co.edu.uniquindio.proyecto.dto.MensajeDTO;
 import co.edu.uniquindio.proyecto.dto.TokenDTO;
@@ -32,6 +33,12 @@ public class AutenticacionController {
                                                                            LoginDTO loginDTO) throws Exception {
         TokenDTO tokenDTO = autenticacionServicio.iniciarSesionModerador(loginDTO);
         return ResponseEntity.ok().body(new MensajeDTO<>(false, tokenDTO));
+    }
+
+    @PostMapping("/registrar-cliente")
+    public ResponseEntity<MensajeDTO<String>> registrarUsuario(@Valid @RequestBody RegistroClienteDTO registroClienteDTO) throws Exception{
+        clienteServicio.registrarCliente(registroClienteDTO);
+        return ResponseEntity.ok().body( new MensajeDTO<>(false, "Cliente registrado correctamente"));
     }
 
 }

@@ -38,11 +38,6 @@ public class ClienteController {
         return ResponseEntity.ok().body(new MensajeDTO<>(false,"Cliente actualizado correctamente."));
     }
 
-    @PostMapping("/registrar-cliente")
-    public ResponseEntity<MensajeDTO<String>> registrarUsuario(@Valid @RequestBody RegistroClienteDTO registroClienteDTO) throws Exception{
-        clienteServicio.registrarCliente(registroClienteDTO);
-        return ResponseEntity.ok().body( new MensajeDTO<>(false, "Cliente registrado correctamente"));
-    }
 
     @DeleteMapping("/eliminar-cliente/{idCliente}")
     public ResponseEntity<MensajeDTO<String>> eliminarCliente(@PathVariable String idCliente) throws Exception { //Que retorne el id de la cuenta eliminada
