@@ -36,9 +36,9 @@ public class AutenticacionController {
     }
 
     @PostMapping("/registrar-cliente")
-    public ResponseEntity<MensajeDTO<String>> registrarUsuario(@Valid @RequestBody RegistroClienteDTO registroClienteDTO) throws Exception{
-        clienteServicio.registrarCliente(registroClienteDTO);
-        return ResponseEntity.ok().body( new MensajeDTO<>(false, "Cliente registrado correctamente"));
+    public ResponseEntity<MensajeDTO<TokenDTO>> registrarUsuario(@Valid @RequestBody RegistroClienteDTO registroClienteDTO) throws Exception{
+        TokenDTO tokenDTO = clienteServicio.registrarCliente(registroClienteDTO);
+        return ResponseEntity.ok().body( new MensajeDTO<>(false, tokenDTO));
     }
 
 }

@@ -16,10 +16,8 @@ import java.time.LocalTime;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class Reserva implements Serializable {
     @Id
-    @EqualsAndHashCode.Include
     private String codigo;
     private String codigoCliente;
     private String codigoNegocio;

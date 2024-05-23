@@ -18,7 +18,6 @@ public class Cliente extends Cuenta   implements Serializable {
 
     private String fotoPerfil;
     @Id
-    @EqualsAndHashCode.Include
     private String codigo;
     private String nickName;
     private String ciudad;

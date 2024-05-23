@@ -13,10 +13,12 @@ import co.edu.uniquindio.proyecto.dto.EmailDTO;
 import co.edu.uniquindio.proyecto.dto.NegocioDTO.ItemNegocioDTO;
 import co.edu.uniquindio.proyecto.dto.ReservaDTO.ItemReservaDTO;
 import co.edu.uniquindio.proyecto.dto.ReservaDTO.RegistroReservaDTO;
+import co.edu.uniquindio.proyecto.dto.TokenDTO;
 import co.edu.uniquindio.proyecto.exceptions.ResourceNotFoundException;
 import co.edu.uniquindio.proyecto.modelo.*;
 import co.edu.uniquindio.proyecto.servicios.interfaces.ClienteServicio;
 import co.edu.uniquindio.proyecto.servicios.interfaces.EmailService;
+import co.edu.uniquindio.proyecto.util.JWTUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -38,9 +40,10 @@ public class ClienteServicioImpl implements ClienteServicio {
     private final NegocioRepo negocioRepo;
     private final ReservaRepo reservaRepo;
     private final EmailService emailService;
+    private final JWTUtils jwtUtils;
 
     @Override
-    public String registrarCliente(RegistroClienteDTO registroClienteDTO) throws Exception {
+    public TokenDTO registrarCliente(RegistroClienteDTO registroClienteDTO) throws Exception {
         //Se crea el objeto usuario
         Cliente cliente = new Cliente();
         //Se le asigna al usuario la información que trae registroDTO
@@ -69,8 +72,15 @@ public class ClienteServicioImpl implements ClienteServicio {
         cliente.setEstado(EstadoRegistro.ACTIVO);
         //Se guarda en la base de datos y obtenemos el objeto registrado
         Cliente clienteGuardado = clienteRepo.save(cliente);
-        //Retornamos el id (código) del cliente registrado
-        return clienteGuardado.getCodigo();
+
+        // Generar el token JWT con la información del cliente
+        Map<String, Object> map = new HashMap<>();
+        map.put("rol", "CLIENTE");
+        map.put("nombre", clienteGuardado.getNombre());
+        map.put("id", clienteGuardado.getCodigo());
+        String token = jwtUtils.generarToken(clienteGuardado.getEmail(), map);
+        //Retornamos el token del cliente registrado
+        return new TokenDTO(token);
     }
 
     private boolean existeEmail(String email) {

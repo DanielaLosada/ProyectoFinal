@@ -8,6 +8,7 @@ import co.edu.uniquindio.proyecto.dto.ClienteDTO.RegistroClienteDTO;
 import co.edu.uniquindio.proyecto.dto.NegocioDTO.ItemNegocioDTO;
 import co.edu.uniquindio.proyecto.dto.ReservaDTO.ItemReservaDTO;
 import co.edu.uniquindio.proyecto.dto.ReservaDTO.RegistroReservaDTO;
+import co.edu.uniquindio.proyecto.dto.TokenDTO;
 import co.edu.uniquindio.proyecto.exceptions.ResourceNotFoundException;
 import co.edu.uniquindio.proyecto.modelo.*;
 import org.springframework.data.mongodb.repository.Query;
@@ -17,7 +18,7 @@ import java.util.List;
 public interface ClienteServicio {
 
     //CRUD-----------------------------------------------
-    String registrarCliente(RegistroClienteDTO registroClienteDTO)throws Exception;
+    TokenDTO registrarCliente(RegistroClienteDTO registroClienteDTO)throws Exception;
     void actualizarCliente(ActualizarClienteDTO actualizarClienteDTO)throws Exception;
     DetalleClienteDTO obtenerCliente(String idCuenta) throws Exception;
     void eliminarCliente(String idCuenta)throws Exception;

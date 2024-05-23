@@ -12,7 +12,6 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Document ("Negocios")
 
 public class  Negocio implements Serializable {
@@ -20,7 +19,6 @@ public class  Negocio implements Serializable {
     private String nombre;
     private String descripcion;
     @Id
-    @EqualsAndHashCode.Include
     private String codigo;
     private String codigoCliente;
     private List<String> listTelefonos;
