@@ -14,7 +14,6 @@ import java.io.Serializable;
 @Document("Moderadores")
 public class Moderador extends Cuenta implements Serializable {
     @Id
-    @EqualsAndHashCode.Include
     private String idModerador;
 
     @Builder
