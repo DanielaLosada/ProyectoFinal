@@ -11,11 +11,11 @@ import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
-public record RegistroNegocioDTO(
+public record RegistroNegocioDTO<T>(
         @NotBlank String nombre,
         @NotBlank @Length(max = 100) String descripcion,
-        @NotEmpty List<String> listImagenes,
-        @NotEmpty List<String> listTelefonos,
+        @NotEmpty List<T> listImagenes,
+        @NotEmpty List<T> listTelefonos,
         @NotNull Ubicacion ubicacion,
         @NotBlank String codigoCliente,
         @NotEmpty List <Horario> listHorarios,

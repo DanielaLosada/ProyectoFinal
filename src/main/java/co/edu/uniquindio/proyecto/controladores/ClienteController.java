@@ -105,7 +105,7 @@ public class ClienteController {
     }
 
     @GetMapping("/get-all-users")
-    public ResponseEntity<List<Cliente>> getAllUsers() {
+    public ResponseEntity<List<Cliente>> getAllUsers(   ) {
         return ResponseEntity.ok(clienteServicio.getAll());
     }
 
