@@ -346,4 +346,30 @@ public class NegocioServicioImpl implements NegocioServicio {
             }
         }
     }
+
+    @Override
+    public List<Negocio> getAllPlacesActives() {
+        List<Negocio> activePlaces = new ArrayList<>();
+        try {
+            // Obtener todos los lugares de la base de datos
+            List<Negocio> allPlaces = negocioRepo.findAll();
+
+            // Verificar si la lista de lugares no está vacía
+            if (allPlaces.isEmpty()) {
+                // Manejar el caso en el que no hay lugares en la base de datos
+                throw new ResourceNotFoundException("No se encontraron lugares en la base de datos");
+            }
+
+            // Filtrar los lugares en estado activo y agregarlos a la lista de lugares activos
+            for (Negocio place : allPlaces) {
+                if (place.getEstadoRegistro().equals(EstadoRegistro.ACTIVO)) {
+                    activePlaces.add(place);
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return activePlaces;
+    }
 }

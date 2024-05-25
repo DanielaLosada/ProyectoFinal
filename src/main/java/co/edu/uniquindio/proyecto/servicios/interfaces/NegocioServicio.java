@@ -5,6 +5,7 @@ import co.edu.uniquindio.proyecto.dto.NegocioDTO.DetalleNegocioDTO;
 import co.edu.uniquindio.proyecto.dto.NegocioDTO.ItemNegocioDTO;
 import co.edu.uniquindio.proyecto.dto.NegocioDTO.RegistroNegocioDTO;
 import co.edu.uniquindio.proyecto.modelo.EstadoNegocio;
+import co.edu.uniquindio.proyecto.modelo.Negocio;
 import co.edu.uniquindio.proyecto.modelo.TipoNegocio;
 
 import java.util.List;
@@ -28,6 +29,8 @@ public interface NegocioServicio {
     List<ItemNegocioDTO> filtrarNegocioEstado (EstadoNegocio estadoNegocio) throws Exception;
 
     void cambiarEstadoNegociosRechazados();
+
+    List<Negocio> getAllPlacesActives();
 
 
     //-------------------------------------------------------

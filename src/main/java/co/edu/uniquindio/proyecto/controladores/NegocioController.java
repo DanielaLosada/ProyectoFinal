@@ -6,6 +6,7 @@ import co.edu.uniquindio.proyecto.dto.NegocioDTO.DetalleNegocioDTO;
 import co.edu.uniquindio.proyecto.dto.NegocioDTO.ItemNegocioDTO;
 import co.edu.uniquindio.proyecto.dto.NegocioDTO.RegistroNegocioDTO;
 import co.edu.uniquindio.proyecto.dto.ReseniaDTO.ItemReseniaDTO;
+import co.edu.uniquindio.proyecto.modelo.Negocio;
 import co.edu.uniquindio.proyecto.modelo.Resenia;
 import co.edu.uniquindio.proyecto.modelo.TipoNegocio;
 import co.edu.uniquindio.proyecto.servicios.implementacion.ReseniaServicioImpl;
@@ -82,6 +83,11 @@ public class NegocioController {
     public ResponseEntity<MensajeDTO<String>> cambiarEstadoNegocioRechazado5Dias() throws Exception{
         negocioServicio.cambiarEstadoNegociosRechazados();
         return ResponseEntity.ok().body(new MensajeDTO<>(false,"El negocio lleva más de 5 dias rechazado, así que su estado pasó a ser inactivo"));
+    }
+
+    @PostMapping("/getPlacesActives")
+    public ResponseEntity<List<Negocio>> getAllPlacesActives() throws Exception{
+        return ResponseEntity.ok().body(negocioServicio.getAllPlacesActives());
     }
 
 }
