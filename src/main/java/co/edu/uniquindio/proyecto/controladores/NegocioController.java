@@ -84,4 +84,11 @@ public class NegocioController {
         return ResponseEntity.ok().body(new MensajeDTO<>(false,"El negocio lleva más de 5 dias rechazado, así que su estado pasó a ser inactivo"));
     }
 
+        @PostMapping("/getPlacesActives")
+        public ResponseEntity<List<Negocio>> getAllPlacesActives() throws Exception{
+            return ResponseEntity.ok().body((false, negocioServicio.getAllPlacesActives()))
+        }
+
+    
+
 }
